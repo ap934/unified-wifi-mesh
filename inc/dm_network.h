@@ -123,7 +123,7 @@ public:
 	 *
 	 * @note Ensure that the MAC address provided is valid and correctly formatted.
 	 */
-	void set_controller_id(unsigned char *mac) { memcpy(m_net_info.ctrl_id.mac, mac, sizeof(mac_address_t)); }
+	void set_controller_id(unsigned char *mac) { if (!mac) return; memcpy(m_net_info.ctrl_id.mac, mac, sizeof(mac_address_t)); }
 	
 	/**!
 	 * @brief Sets the media type for the network interface.
@@ -179,7 +179,7 @@ public:
 	 *
 	 * @note Ensure that the MAC address provided is valid and the memory is properly allocated.
 	 */
-	void set_colocated_agent_interface_mac(unsigned char *mac) { memcpy(m_net_info.colocated_agent_id.mac, mac, sizeof(mac_address_t)); }
+	void set_colocated_agent_interface_mac(unsigned char *mac) { if (!mac) return; memcpy(m_net_info.colocated_agent_id.mac, mac, sizeof(mac_address_t)); }
     
 	/**!
 	 * @brief Sets the name of the colocated agent interface.
@@ -190,7 +190,7 @@ public:
 	 *
 	 * @note Ensure that the name is null-terminated and does not exceed the buffer size.
 	 */
-	void set_colocated_agent_interface_name(char *name) { snprintf(m_net_info.colocated_agent_id.name, sizeof(m_net_info.colocated_agent_id.name), "%s", name); }
+	void set_colocated_agent_interface_name(char *name) { if (!name) return; snprintf(m_net_info.colocated_agent_id.name, sizeof(m_net_info.colocated_agent_id.name), "%s", name); }
 
     bool operator == (const dm_network_t& obj);
     //void operator = (const dm_network_t& obj) { memcpy(&m_net_info, &obj.m_net_info, sizeof(em_network_info_t)); }

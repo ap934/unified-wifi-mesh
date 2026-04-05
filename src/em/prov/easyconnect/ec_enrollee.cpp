@@ -582,6 +582,10 @@ bool ec_enrollee_t::handle_recfg_auth_confirm(ec_frame_t *frame, size_t len, uin
 
 bool ec_enrollee_t::handle_auth_request(ec_frame_t *frame, size_t len, uint8_t src_mac[ETHER_ADDR_LEN], unsigned int recv_freq)
 {
+    if (frame == NULL || src_mac == NULL) {
+        em_printfout("Invalid NULL parameter in handle_auth_request");
+        return false;
+    }
     em_printfout("Recieved a DPP Authentication Request from '" MACSTRFMT "', stopping Presence Announcement\n", MAC2STR(src_mac));
     // Halt presence announcement once DPP Authentication frame is received.
     m_received_auth_frame.store(true);
@@ -688,7 +692,7 @@ Authentication Request frame without replying to it.
     };
 
     auto i_nonce_attr = ec_util::get_attrib(wrapped_data, static_cast<uint16_t>(wrapped_len), ec_attrib_id_init_nonce);
-    ASSERT_OPT_HAS_VALUE_FREE(init_caps_attr, false, wrapped_data, "%s:%d: No initiator nonce attribute found\n", __func__, __LINE__);
+    ASSERT_OPT_HAS_VALUE_FREE(i_nonce_attr, false, wrapped_data, "%s:%d: No initiator nonce attribute found\n", __func__, __LINE__);
     memcpy(m_eph_ctx().i_nonce, i_nonce_attr->data, i_nonce_attr->length);
     em_printfout("i-nonce (Configurator is initiator)");
     util::print_hex_dump(i_nonce_attr->length, m_eph_ctx().i_nonce);
@@ -763,6 +767,10 @@ Authentication Request frame without replying to it.
 
 bool ec_enrollee_t::handle_auth_confirm(ec_frame_t *frame, size_t len, uint8_t src_mac[ETHER_ADDR_LEN])
 {
+    if (frame == NULL || src_mac == NULL) {
+        em_printfout("Invalid NULL parameter in handle_auth_confirm");
+        return false;
+    }
     size_t attrs_len = len - EC_FRAME_BASE_SIZE;
 
     auto status_attrib = ec_util::get_attrib(frame->attributes, attrs_len, ec_attrib_id_dpp_status);
@@ -904,6 +912,10 @@ bool ec_enrollee_t::handle_auth_confirm(ec_frame_t *frame, size_t len, uint8_t s
 
 bool ec_enrollee_t::handle_config_response(uint8_t *query_resp, size_t len, uint8_t sa[ETH_ALEN])
 {
+    if (sa == NULL) {
+        em_printfout("Invalid NULL source MAC in handle_config_response");
+        return false;
+    }
     // EasyMesh 5.4.3
     // If an Enrollee Multi-AP Agent receives a DPP Configuration Response frame, it shall send a DPP Configuration Result
     // frame as per [18], configure its 1905 and backhaul STA interfaces with the parameters received in the DPP Configuration
@@ -1979,6 +1991,10 @@ bool ec_enrollee_t::process_direct_encap_dpp_msg(uint8_t* dpp_frame, uint16_t dp
 {
     if (dpp_frame == NULL || dpp_frame_len == 0) {
         em_printfout("DPP Message Frame is empty");
+        return false;
+    }
+    if (src_mac == NULL) {
+        em_printfout("Invalid NULL source MAC in process_direct_encap_dpp_msg");
         return false;
     }
 

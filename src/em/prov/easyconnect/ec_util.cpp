@@ -97,6 +97,9 @@ uint16_t ec_util::freq_to_channel_attr(unsigned int freq)
 
 bool ec_util::validate_frame(const ec_frame_t *frame)
 {
+    if (frame == NULL) {
+        return false;
+    }
     if ((frame->category != 0x04) 
             || (frame->action != 0x09)
             || (frame->oui[0] != 0x50)

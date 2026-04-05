@@ -308,6 +308,9 @@ int dm_easy_mesh_t::analyze_ap_cap_query(em_bus_event_t *evt, em_cmd_t *pcmd[])
     dm_easy_mesh_t  dm;
     em_orch_desc_t desc;
     em_subdoc_info_t *subdoc;
+
+    if (!evt || !pcmd) return 0;
+
     subdoc = &evt->u.subdoc;
 
     desc.op = dm_orch_type_ap_cap_report;
@@ -338,6 +341,8 @@ int dm_easy_mesh_t::analyze_dev_init(em_bus_event_t *evt, em_cmd_t *pcmd[])
 int dm_easy_mesh_t::encode_config(em_subdoc_info_t *subdoc, const char *str)
 {
 	em_long_string_t key;
+
+	if (!subdoc || !str) return -1;
 
 	if (strncmp(str, "Reset", strlen("Reset")) == 0) {
     	snprintf(key, sizeof(em_long_string_t), "wfa-dataelements:%s", str);
@@ -440,7 +445,9 @@ int dm_easy_mesh_t::encode_config_op_class_array(cJSON *arr_obj, em_op_class_typ
 	unsigned int i;
 	cJSON *op_obj;
 	mac_addr_str_t	mac_str;
-	
+
+	if (!arr_obj || !mac) return -1;
+
 	dm_easy_mesh_t::macbytes_to_string(mac, mac_str);
 
 	for (i = 0; i < m_num_opclass; i++) {
@@ -469,6 +476,8 @@ int dm_easy_mesh_t::encode_config_test(em_subdoc_info_t *subdoc, const char *key
 	cJSON *cap_obj, *op_arr_objs, *bss_obj, *bss_arr_objs;
 	char *formatted_json;
 	unsigned int i, j;
+
+    if (!subdoc || !key) return -1;
 
     if ((parent_obj = cJSON_CreateObject()) == NULL) {
         printf("%s:%d: Could not create parent object\n", __func__, __LINE__);
@@ -1630,6 +1639,8 @@ char *dm_easy_mesh_t::hex(unsigned int in_len, unsigned char *in, unsigned int o
     unsigned int i;
     unsigned char tmp;
 
+    if (!in || !out) return NULL;
+
     if (out_len < 2*in_len + 1) {
         return NULL;
     }
@@ -1659,6 +1670,8 @@ unsigned char *dm_easy_mesh_t::unhex(unsigned int in_len, char *in, unsigned int
 {
     unsigned int i;
     unsigned char tmp1, tmp2;
+
+    if (!in || !out) return NULL;
 
     if (out_len < in_len/2) {
         return NULL;
@@ -1844,6 +1857,8 @@ int dm_easy_mesh_t::get_interfaces_list(em_interface_t interfaces[], unsigned in
 	struct sockaddr_ll *ll_addr;	
 	unsigned int num = 0;
 	mac_address_t null_mac = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
+    if (!interfaces || !num_interfaces) return -1;
 
     if (getifaddrs(&ifaddr) != 0) {
         printf("%s:%d: Failed to get interfae information\n", __func__, __LINE__);
@@ -2223,6 +2238,8 @@ em_bss_info_t *dm_easy_mesh_t::get_bss_info_with_mac(mac_address_t mac)
 
 void dm_easy_mesh_t::create_autoconfig_renew_json_cmd(char* src_mac_addr, char* agent_al_mac, em_freq_band_t freq_band, char* autoconfig_renew_json)
 {
+    if (!src_mac_addr || !agent_al_mac || !autoconfig_renew_json) return;
+
     cJSON *root, *renew, *device_list, *radio_list, *current_operating_classes, *class_item;
     int op_class = em_freq_band_24;
     root = cJSON_CreateObject();
@@ -2267,6 +2284,8 @@ void dm_easy_mesh_t::create_autoconfig_renew_json_cmd(char* src_mac_addr, char* 
 
 void dm_easy_mesh_t::create_ap_cap_query_json_cmd(char* src_mac_addr, char* agent_al_mac, char* ap_query_json, short msg_id)
 {
+    if (!src_mac_addr || !agent_al_mac || !ap_query_json) return;
+
     cJSON *root, *query_info, *device_list;
     root = cJSON_CreateObject();
     query_info = cJSON_CreateObject();
@@ -2289,6 +2308,8 @@ void dm_easy_mesh_t::create_ap_cap_query_json_cmd(char* src_mac_addr, char* agen
 
 void dm_easy_mesh_t::create_client_cap_query_json_cmd(char* src_mac_addr, char* agent_al_mac, char* ap_query_json, short msg_id, char *mac)
 {
+    if (!src_mac_addr || !agent_al_mac || !ap_query_json || !mac) return;
+
     cJSON *root, *query_info, *device_list;
     root = cJSON_CreateObject();
     query_info = cJSON_CreateObject();
@@ -2628,6 +2649,8 @@ int dm_easy_mesh_t::get_num_bss_for_associated_sta(mac_address_t sta_mac)
     dm_sta_t *sta;
     int num_bssids = 0;
 
+    if (!m_sta_map) return 0;
+
     sta = static_cast<dm_sta_t *> (hash_map_get_first(m_sta_map));
     while (sta != NULL) {
         if (memcmp(sta->m_sta_info.id, sta_mac, sizeof(mac_address_t)) == 0) {
@@ -2686,6 +2709,7 @@ void dm_easy_mesh_t::deinit()
     mac_addr_str_t dev_mac_str, radio_mac_str, bss_mac_str, sta_mac_str, scanner_mac_str;
 
     //destroy elements of m_scan_result_map
+    if (m_scan_result_map) {
 	res = static_cast<dm_scan_result_t *> (hash_map_get_first(m_scan_result_map));
 	while (res != NULL) {
 		tmp_res = res;
@@ -2699,9 +2723,11 @@ void dm_easy_mesh_t::deinit()
 		hash_map_remove(m_scan_result_map, key);
 	}
 
-	hash_map_destroy(m_scan_result_map);	
+	hash_map_destroy(m_scan_result_map);
+    }
 
     //destroy elements of m_sta_map
+    if (m_sta_map) {
     sta = static_cast<dm_sta_t *> (hash_map_get_first(m_sta_map));
     while (sta != NULL) {
         tmp_sta = sta;
@@ -2715,8 +2741,10 @@ void dm_easy_mesh_t::deinit()
         hash_map_remove(m_sta_map, key);
     }
     hash_map_destroy(m_sta_map);
+    }
     sta = NULL;
 
+    if (m_sta_assoc_map) {
     sta = static_cast<dm_sta_t *> (hash_map_get_first(m_sta_assoc_map));
     while (sta != NULL)
     {
@@ -2730,8 +2758,10 @@ void dm_easy_mesh_t::deinit()
         hash_map_remove(m_sta_assoc_map, key);
     }
 	hash_map_destroy(m_sta_assoc_map);
+    }
     sta = NULL;
 
+    if (m_sta_dassoc_map) {
     sta = static_cast<dm_sta_t *> (hash_map_get_first(m_sta_dassoc_map));
     while (sta != NULL)
     {
@@ -2746,6 +2776,7 @@ void dm_easy_mesh_t::deinit()
         hash_map_remove(m_sta_dassoc_map, key);
     }
 	hash_map_destroy(m_sta_dassoc_map);
+    }
 	if (m_wifi_data != NULL) {
         free(m_wifi_data);
         m_wifi_data = nullptr;

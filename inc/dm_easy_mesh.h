@@ -757,7 +757,7 @@ public:
 	 *
 	 * @note Ensure that the MAC address is valid and correctly formatted before calling this function.
 	 */
-	void set_controller_id(unsigned char *mac) { m_network.set_controller_id(mac); }
+	void set_controller_id(unsigned char *mac) { if (!mac) return; m_network.set_controller_id(mac); }
 	
 	/**!
 	 * @brief Sets the controller interface media type.
@@ -812,7 +812,7 @@ public:
 	 *
 	 * @note Ensure that the MAC address is valid and properly formatted before calling this function.
 	 */
-	void set_agent_al_interface_mac(unsigned char *mac) { m_device.set_dev_interface_mac(mac); }
+	void set_agent_al_interface_mac(unsigned char *mac) { if (!mac) return; m_device.set_dev_interface_mac(mac); }
     
 	/**!
 	 * @brief Sets the interface name for the agent.
@@ -823,7 +823,7 @@ public:
 	 *
 	 * @note The name should be a valid network interface identifier.
 	 */
-	void set_agent_al_interface_name(char *name) { return m_device.set_dev_interface_name(name); }
+	void set_agent_al_interface_name(char *name) { if (!name) return; m_device.set_dev_interface_name(name); }
 
     
 	/**!

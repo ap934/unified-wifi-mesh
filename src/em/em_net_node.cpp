@@ -38,6 +38,9 @@
 
 em_network_node_data_type_t em_net_node_t::get_node_type(em_network_node_t *node)
 {
+    if (node == NULL) {
+        return em_network_node_data_type_invalid;
+    }
     return node->type;
 }
 
@@ -54,6 +57,11 @@ char *em_net_node_t::get_node_array_value(em_network_node_t *node, em_network_no
 
     str = static_cast<char *> (malloc(sizeof(em_long_string_t)));
     memset(str, 0, sizeof(em_long_string_t));
+
+    if (node == NULL || type == NULL) {
+        snprintf(str, sizeof(em_long_string_t), "[]");
+        return str;
+    }
 
     if (node->num_children == 0) {
 		snprintf(str, sizeof(em_long_string_t), "[]");
@@ -81,6 +89,9 @@ char *em_net_node_t::get_node_array_value(em_network_node_t *node, em_network_no
 
 void em_net_node_t::set_node_array_value(em_network_node_t *node, char *fmt)
 {
+	if (node == NULL || fmt == NULL) {
+		return;
+	}
 	em_long_string_t value;
 	char *tmp, *remain;
 	em_network_node_data_type_t arrType = em_network_node_data_type_invalid;
@@ -155,6 +166,10 @@ char *em_net_node_t::get_node_scalar_value(em_network_node_t *node)
     str = static_cast<char *> (malloc(sizeof(em_long_string_t)));
     memset(str, 0, sizeof(em_long_string_t));
 
+    if (node == NULL) {
+        return str;
+    }
+
     switch (node->type) {
         case em_network_node_data_type_invalid:
             break;
@@ -199,6 +214,9 @@ char *em_net_node_t::get_node_scalar_value(em_network_node_t *node)
 
 void em_net_node_t::set_node_scalar_value(em_network_node_t *node, char *fmt)
 {
+	if (node == NULL || fmt == NULL) {
+		return;
+	}
 	switch (node->type) {
 		case em_network_node_data_type_false:
 			node->value_int = 0;
@@ -223,6 +241,9 @@ void em_net_node_t::set_node_scalar_value(em_network_node_t *node, char *fmt)
 
 void em_net_node_t::get_network_tree_node_string(char *str, em_network_node_t *node, unsigned int *pident)
 {
+    if (node == NULL || str == NULL || pident == NULL) {
+        return;
+    }
     unsigned int i, ident = 0;
     em_long_string_t fmt = {0};
     em_3xlong_string_t string = {0};
@@ -364,6 +385,9 @@ char *em_net_node_t::get_network_tree_string(em_network_node_t *node)
 
 cJSON *em_net_node_t::network_tree_node_to_json(em_network_node_t *node, cJSON *parent)
 {
+    if (node == NULL || parent == NULL) {
+        return NULL;
+    }
     unsigned int i;
     cJSON *obj = NULL;
 
@@ -426,6 +450,10 @@ void *em_net_node_t::network_tree_to_json(em_network_node_t *root)
     cJSON *obj;
     unsigned int i;
 
+    if (root == NULL) {
+        return cJSON_CreateObject();
+    }
+
     obj = cJSON_CreateObject();
     if (obj == NULL) {
         printf("%s:%d: Failed to allocate JSON object\n",__func__,__LINE__);
@@ -441,6 +469,9 @@ void *em_net_node_t::network_tree_to_json(em_network_node_t *root)
 
 int em_net_node_t::get_network_tree_node(cJSON *obj, em_network_node_t *root, unsigned int *node_display_ctr)
 {
+    if (obj == NULL || root == NULL || node_display_ctr == NULL) {
+        return -1;
+    }
     cJSON *child_obj, *tmp_obj;
     size_t sz = 0;
 
@@ -694,6 +725,9 @@ em_network_node_t *em_net_node_t::get_network_tree_by_file(const char *file_name
 
 void em_net_node_t::free_network_tree_node(em_network_node_t *node)
 {
+    if (node == NULL) {
+        return;
+    }
     unsigned int i;
 
     for (i = 0; i < node->num_children; i++) {
@@ -705,22 +739,34 @@ void em_net_node_t::free_network_tree_node(em_network_node_t *node)
 
 void em_net_node_t::free_network_tree(em_network_node_t *node)
 {
+    if (node == NULL) {
+        return;
+    }
     free_network_tree_node(node);
 }
 
 em_network_node_t *em_net_node_t::get_child_node_at_index(em_network_node_t *node, unsigned int idx)
 {
+    if (node == NULL) {
+        return NULL;
+    }
     //printf("%s:%d: Index: %d(%d), node:%p\n", __func__, __LINE__, idx, node->num_children, node->child[idx]);
     return node->child[idx];
 }
 
 unsigned int em_net_node_t::get_node_display_position(em_network_node_t *node)
 {
+    if (node == NULL) {
+        return 0;
+    }
     return node->display_info.node_pos;
 }
 
 em_network_node_t *em_net_node_t::get_network_tree_by_key(em_network_node_t *node, em_long_string_t key)
 {
+	if (node == NULL) {
+		return NULL;
+	}
 	unsigned int i;
 	em_network_node_t *tmp;
 

@@ -37,6 +37,10 @@
 
 int dm_policy_t::decode(const cJSON *obj, void *parent_id, em_policy_id_type_t type)
 {
+    if (!obj || !parent_id) {
+        printf("%s:%d: Invalid obj or parent_id pointer\n", __func__, __LINE__);
+        return -1;
+    }
     cJSON *tmp, *sta_arr_obj;
 	em_policy_id_t id;
 	int i;
@@ -246,6 +250,10 @@ void dm_policy_t::operator = (const dm_policy_t& obj)
 
 int dm_policy_t::parse_dev_radio_mac_from_key(const char *key, em_policy_id_t *id)
 {
+    if (!key || !id) {
+        printf("%s:%d: Invalid key or id pointer\n", __func__, __LINE__);
+        return -1;
+    }
     em_long_string_t   str;
     char *tmp, *remain;
     unsigned int i = 0;

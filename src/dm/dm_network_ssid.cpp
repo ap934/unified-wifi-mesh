@@ -111,6 +111,10 @@ int dm_network_ssid_t::decode(const cJSON *obj, void *parent_id)
 
 void dm_network_ssid_t::encode(cJSON *obj)
 {
+    if (!obj) {
+        printf("%s:%d: Invalid cJSON object pointer\n", __func__, __LINE__);
+        return;
+    }
   
     unsigned int i;
     mac_addr_str_t  mac_str;

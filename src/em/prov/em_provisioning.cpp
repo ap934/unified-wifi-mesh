@@ -50,6 +50,8 @@
 
 int em_provisioning_t::create_cce_ind_msg(uint8_t *buff, bool enable)
 {
+    if (!buff) return 0;
+
     unsigned int len = 0;
 
     /*
@@ -432,6 +434,8 @@ int em_provisioning_t::handle_cce_ind_msg(uint8_t *buff, unsigned int len)
 
 void em_provisioning_t::process_msg(uint8_t *data, unsigned int len)
 {
+    if (!data || len < sizeof(em_raw_hdr_t)) return;
+
     em_cmdu_t *cmdu = reinterpret_cast<em_cmdu_t *> (data + sizeof(em_raw_hdr_t));
 
     em_raw_hdr_t *hdr = reinterpret_cast<em_raw_hdr_t *>(data);

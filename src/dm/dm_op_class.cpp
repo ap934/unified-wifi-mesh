@@ -36,6 +36,10 @@
 
 int dm_op_class_t::decode(const cJSON *obj, void *parent_id)
 {
+    if (!obj || !parent_id) {
+        printf("%s:%d: Invalid obj or parent_id pointer\n", __func__, __LINE__);
+        return -1;
+    }
     cJSON *tmp, *non_op_array;
     unsigned int i;
 
@@ -183,6 +187,10 @@ void dm_op_class_t::operator = (const dm_op_class_t& obj)
 
 int dm_op_class_t::parse_op_class_id_from_key(const char *key, em_op_class_id_t *id)
 {
+    if (!key || !id) {
+        printf("%s:%d: Invalid key or id pointer\n", __func__, __LINE__);
+        return -1;
+    }
     em_long_string_t   str;
     char *tmp, *remain;
     unsigned int i = 0;
@@ -209,6 +217,11 @@ int dm_op_class_t::parse_op_class_id_from_key(const char *key, em_op_class_id_t 
 
 dm_op_class_t::dm_op_class_t(em_op_class_info_t *op_class)
 {
+    if (!op_class) {
+        printf("%s:%d: Invalid op_class pointer\n", __func__, __LINE__);
+        memset(&m_op_class_info, 0, sizeof(em_op_class_info_t));
+        return;
+    }
     memcpy(&m_op_class_info, op_class, sizeof(em_op_class_info_t));
 }
 

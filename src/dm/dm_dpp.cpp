@@ -58,6 +58,10 @@ int dm_dpp_t::analyze_config(const cJSON *obj, void *parent, em_cmd_t *pcmd[], e
 
 int dm_dpp_t::decode(const cJSON *obj, void *parent_id, void* user_info)
 {
+    if (!obj) {
+        printf("%s:%d: Invalid cJSON object pointer\n", __func__, __LINE__);
+        return -1;
+    }
     printf("%s:%d: Decoding DPP\n", __func__, __LINE__);
 
     std::string country_code = "US";

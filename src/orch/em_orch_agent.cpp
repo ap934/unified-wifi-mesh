@@ -43,7 +43,9 @@ void em_orch_agent_t::orch_transient(em_cmd_t *pcmd, em_t *em)
 {
     em_cmd_stats_t *stats;
     em_short_string_t key;
-    
+
+    if (!pcmd || !em) return;
+
     snprintf(key, sizeof(em_short_string_t), "%d", pcmd->get_type());
 
     stats = static_cast <em_cmd_stats_t *> (hash_map_get(m_cmd_map, key));
@@ -154,6 +156,8 @@ bool em_orch_agent_t::is_em_ready_for_orch_fini(em_cmd_t *pcmd, em_t *em)
 
 bool em_orch_agent_t::is_em_ready_for_orch_exec(em_cmd_t *pcmd, em_t *em)
 {
+	if (!pcmd || !em) return false;
+
 	if (pcmd->m_type == em_cmd_type_dev_init) {
         return true;
     } else if (pcmd->m_type == em_cmd_type_onewifi_cb) {
@@ -221,6 +225,8 @@ bool em_orch_agent_t::pre_process_orch_op(em_cmd_t *pcmd)
     em_long_string_t key;
     mac_addr_str_t sta_mac_str, bss_mac_str, radio_mac_str;
     em_freq_band_t band;
+
+    if (!pcmd) return false;
 
     ctx = pcmd->m_data_model.get_cmd_ctx();
 
@@ -349,6 +355,8 @@ unsigned int em_orch_agent_t::build_candidates(em_cmd_t *pcmd)
     dm_easy_mesh_t dm;
     mac_address_t	radio_mac, mac1, mac2;
     dm_sta_t *sta;
+
+    if (!pcmd) return 0;
 
     ctx = pcmd->m_data_model.get_cmd_ctx();
 	pthread_mutex_lock(&m_mgr->m_mutex);

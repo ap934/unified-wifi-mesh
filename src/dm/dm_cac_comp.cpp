@@ -66,6 +66,11 @@ void dm_cac_comp_t::operator = (const dm_cac_comp_t& obj)
 
 dm_cac_comp_t::dm_cac_comp_t(em_cac_comp_info_t *radio)
 {
+    if (!radio) {
+        printf("%s:%d: Invalid radio pointer\n", __func__, __LINE__);
+        memset(&m_cac_comp_info, 0, sizeof(em_cac_comp_info_t));
+        return;
+    }
     memcpy(&m_cac_comp_info, radio, sizeof(em_cac_comp_info_t));
 }
 

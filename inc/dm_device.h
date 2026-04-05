@@ -121,7 +121,7 @@ public:
 	 *
 	 * @note Ensure that the MAC address provided is valid and correctly formatted.
 	 */
-	void set_dev_interface_mac(unsigned char *mac) { memcpy(m_device_info.intf.mac, mac, sizeof(mac_address_t)); }
+	void set_dev_interface_mac(unsigned char *mac) { if (!mac) return; memcpy(m_device_info.intf.mac, mac, sizeof(mac_address_t)); }
     
 	/**!
 	 * @brief Sets the device interface name.
@@ -132,7 +132,7 @@ public:
 	 *
 	 * @note Ensure that the name is null-terminated and does not exceed the buffer size.
 	 */
-	void set_dev_interface_name(char *name) { strncpy(m_device_info.intf.name, name, strlen(name) + 1); }
+	void set_dev_interface_name(char *name) { if (!name) return; strncpy(m_device_info.intf.name, name, strlen(name) + 1); }
 	
     
 	/**!

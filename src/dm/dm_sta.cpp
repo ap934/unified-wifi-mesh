@@ -37,6 +37,10 @@
 
 int dm_sta_t::decode(const cJSON *obj, void *parent_id)
 {
+    if (!obj || !parent_id) {
+        printf("%s:%d: Invalid obj or parent_id pointer\n", __func__, __LINE__);
+        return -1;
+    }
     cJSON *tmp;
     mac_addr_str_t  mac_str;
 
@@ -370,6 +374,10 @@ void dm_sta_t::operator = (const dm_sta_t& obj)
 
 void dm_sta_t::parse_sta_bss_radio_from_key(const char *key, mac_address_t sta, bssid_t bssid, mac_address_t ruid)
 {
+    if (!key) {
+        printf("%s:%d: Invalid key pointer\n", __func__, __LINE__);
+        return;
+    }
     em_long_string_t   str;
     char *tmp, *remain;
     unsigned int i = 0;
@@ -394,6 +402,10 @@ void dm_sta_t::parse_sta_bss_radio_from_key(const char *key, mac_address_t sta, 
 
 void dm_sta_t::decode_sta_capability(dm_sta_t *sta)
 {
+    if (!sta) {
+        printf("%s:%d: Invalid sta pointer\n", __func__, __LINE__);
+        return;
+    }
     unsigned int offset = 0;
     unsigned char length;
     tag_type_t tag_id;
@@ -520,6 +532,10 @@ void dm_sta_t::decode_sta_capability(dm_sta_t *sta)
 
 void dm_sta_t::decode_beacon_report(dm_sta_t *sta)
 {
+    if (!sta || !sta->m_sta_info.beacon_report_elem) {
+        printf("%s:%d: Invalid sta or beacon_report_elem pointer\n", __func__, __LINE__);
+        return;
+    }
     unsigned int i =0;
     unsigned char *ie;
     int current_pkt_len = 0;

@@ -96,6 +96,11 @@ void dm_ieee_1905_security_t::operator = (const dm_ieee_1905_security_t& obj)
 
 dm_ieee_1905_security_t::dm_ieee_1905_security_t(em_ieee_1905_security_info_t *ieee_1905_security)
 {
+    if (!ieee_1905_security) {
+        printf("%s:%d: Invalid ieee_1905_security pointer\n", __func__, __LINE__);
+        memset(&m_ieee_1905_security_info, 0, sizeof(em_ieee_1905_security_info_t));
+        return;
+    }
     memcpy(&m_ieee_1905_security_info, ieee_1905_security, sizeof(em_ieee_1905_security_info_t));
 }
 

@@ -46,6 +46,8 @@ void em_orch_ctrl_t::orch_transient(em_cmd_t *pcmd, em_t *em)
     em_cmd_stats_t *stats;
     em_short_string_t key;
 
+    if (!pcmd || !em) return;
+
     snprintf(key, sizeof(em_short_string_t), "%d", pcmd->get_type());
 
     stats = static_cast<em_cmd_stats_t *>(hash_map_get(m_cmd_map, key));
@@ -282,6 +284,8 @@ bool em_orch_ctrl_t::is_em_ready_for_orch_fini(em_cmd_t *pcmd, em_t *em)
 
 bool em_orch_ctrl_t::is_em_ready_for_orch_exec(em_cmd_t *pcmd, em_t *em)
 {
+    if (!pcmd || !em) return false;
+
     switch (pcmd->m_type) {
         case em_cmd_type_set_ssid:
         case em_cmd_type_set_radio:
@@ -349,6 +353,8 @@ void em_orch_ctrl_t::pre_process_cancel(em_cmd_t *pcmd, em_t *em)
 	em_ctrl_t *ctrl = static_cast<em_ctrl_t *>(m_mgr);
 	em_cmd_ctrl_t *cmd_ctrl = ctrl->get_ctrl_cmd();
 
+	if (!pcmd || !em) return;
+
 	switch (pcmd->get_type()) {
 		case em_cmd_type_em_config:
            	em->set_state(em_state_ctrl_misconfigured);
@@ -388,7 +394,11 @@ bool em_orch_ctrl_t::pre_process_orch_op(em_cmd_t *pcmd)
     em_t *em;
     em_ctrl_t *ctrl = static_cast<em_ctrl_t *>(m_mgr);
     dm_easy_mesh_ctrl_t *dm_ctrl = reinterpret_cast<dm_easy_mesh_ctrl_t *>(ctrl->get_data_model(GLOBAL_NET_ID));
-    dm_easy_mesh_t *dm = &pcmd->m_data_model;
+    dm_easy_mesh_t *dm;
+
+    if (!pcmd) return false;
+
+    dm = &pcmd->m_data_model;
     dm_easy_mesh_t *mgr_dm;
     mac_addr_str_t	mac_str;
     em_commit_target_t config;
@@ -510,6 +520,8 @@ unsigned int em_orch_ctrl_t::build_candidates(em_cmd_t *pcmd)
     em_disassoc_params_t *disassoc_param;
     dm_sta_t *sta;
 	mac_address_t null_mac = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
+    if (!pcmd) return 0;
 
     if (pcmd->m_type == em_cmd_type_em_config) {
         em = static_cast<em_t *>(hash_map_get(m_mgr->m_em_map, pcmd->m_param.u.args.args[0]));

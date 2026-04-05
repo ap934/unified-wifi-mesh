@@ -37,6 +37,10 @@
 
 int dm_bss_t::decode(const cJSON *obj, void *parent_id)
 {
+    if (!obj || !parent_id) {
+        printf("%s:%d: Invalid obj or parent_id pointer\n", __func__, __LINE__);
+        return -1;
+    }
     cJSON *tmp, *tmp_arr;
     mac_addr_str_t  mac_str;
     int i;
@@ -181,6 +185,10 @@ int dm_bss_t::decode(const cJSON *obj, void *parent_id)
 
 void dm_bss_t::encode(cJSON *obj, bool summary)
 {
+    if (!obj) {
+        printf("%s:%d: Invalid cJSON object pointer\n", __func__, __LINE__);
+        return;
+    }
     mac_addr_str_t  mac_str;
     unsigned short i;
 	em_short_string_t	haul_type_str;
@@ -367,6 +375,10 @@ bool dm_bss_t::operator == (const dm_bss_t& obj)
 
 bool dm_bss_t::match_criteria(char *criteria)
 {
+	if (!criteria) {
+		printf("%s:%d: Invalid criteria pointer\n", __func__, __LINE__);
+		return false;
+	}
 	char *tmp;
 	mac_address_t radio_mac;
 
@@ -386,6 +398,10 @@ bool dm_bss_t::match_criteria(char *criteria)
 
 int dm_bss_t::parse_bss_id_from_key(const char *key, em_bss_id_t *id)
 {
+    if (!key || !id) {
+        printf("%s:%d: Invalid key or id pointer\n", __func__, __LINE__);
+        return -1;
+    }
     em_long_string_t   str;
     char *tmp, *remain;
     unsigned int i = 0;
@@ -423,6 +439,10 @@ int dm_bss_t::parse_bss_id_from_key(const char *key, em_bss_id_t *id)
 
 bool dm_bss_t::add_vendor_ie(const struct ieee80211_vs_ie *vs_ie)
 {
+    if (!vs_ie) {
+        printf("%s:%d: Invalid vendor IE pointer\n", __func__, __LINE__);
+        return false;
+    }
     // Fetch full length from the IE
     unsigned int vs_ie_len = offsetof(struct ieee80211_vs_ie, vs_oui) + vs_ie->vs_len;
 
@@ -440,6 +460,10 @@ bool dm_bss_t::add_vendor_ie(const struct ieee80211_vs_ie *vs_ie)
 
 void dm_bss_t::remove_vendor_ie(const struct ieee80211_vs_ie *vs_ie)
 {
+    if (!vs_ie) {
+        printf("%s:%d: Invalid vendor IE pointer\n", __func__, __LINE__);
+        return;
+    }
     size_t vs_ie_len = offsetof(struct ieee80211_vs_ie, vs_oui) + vs_ie->vs_len;
     if (m_bss_info.vendor_elements_len < vs_ie_len) {
         // The IE is not present in the BSS, return true since it's technically removed

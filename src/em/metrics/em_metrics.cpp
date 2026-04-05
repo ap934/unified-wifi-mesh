@@ -1624,6 +1624,8 @@ short em_metrics_t::create_error_code_tlv(unsigned char *buff, mac_address_t sta
 
 void em_metrics_t::process_msg(unsigned char *data, unsigned int len)
 {
+    if (!data || len < sizeof(em_raw_hdr_t)) return;
+
     em_cmdu_t *cmdu = reinterpret_cast<em_cmdu_t *> (data + sizeof(em_raw_hdr_t));
 
     switch (htons(cmdu->type)) {

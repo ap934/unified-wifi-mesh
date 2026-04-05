@@ -193,6 +193,8 @@ em_network_topo_t *em_network_topo_t::find_topology_by_bss_mac(mac_address_t bss
 
 void em_network_topo_t::print_topology()
 {
+	if (!m_data_model) return;
+
 	std::string dev_mac_str = util::mac_to_string(m_data_model->m_device.m_device_info.intf.mac);
 	em_printfout("Network Topology of dev_mac:%s num_child_topologies:%d", dev_mac_str.c_str(), m_num_topologies);
 	em_printfout("---- Child Topologies[%s] <start> -----", dev_mac_str.c_str());
@@ -207,6 +209,8 @@ em_network_topo_t *em_network_topo_t::find_topology(dm_easy_mesh_t *dm)
 	unsigned int i;
 	em_network_topo_t *topo;
 	mac_addr_str_t tgt_dev_mac_str, src_dev_mac_str;
+
+	if (!dm) return NULL;
 
 	dm_easy_mesh_t::macbytes_to_string(dm->m_device.m_device_info.intf.mac, tgt_dev_mac_str);
 	dm_easy_mesh_t::macbytes_to_string(m_data_model->m_device.m_device_info.intf.mac, src_dev_mac_str);
@@ -228,6 +232,8 @@ em_network_topo_t *em_network_topo_t::find_topology(dm_easy_mesh_t *dm)
 
 void em_network_topo_t::add_network_topo(dm_easy_mesh_t *dm, em_network_topo_t **child_topos, unsigned int num_child_topos)
 {
+	if (!dm) return;
+
 	std::string dev_mac_str = util::mac_to_string(dm->m_device.m_device_info.intf.mac);
 	if (m_num_topologies >= EM_MAX_NETWORKS) {
 		em_printfout("Cannot add more topologies, max limit reached");

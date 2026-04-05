@@ -38,6 +38,10 @@
 
 int dm_radio_t::decode(const cJSON *obj, void *parent_id)
 {
+    if (!obj || !parent_id) {
+        printf("%s:%d: Invalid obj or parent_id pointer\n", __func__, __LINE__);
+        return -1;
+    }
     cJSON *tmp;
     mac_addr_str_t  mac_str, dev_mac;
 
@@ -132,6 +136,10 @@ int dm_radio_t::decode(const cJSON *obj, void *parent_id)
 
 void dm_radio_t::encode(cJSON *obj, em_get_radio_list_reason_t reason)
 {
+    if (!obj) {
+        printf("%s:%d: Invalid cJSON object pointer\n", __func__, __LINE__);
+        return;
+    }
     mac_addr_str_t  mac_str;
 
     dm_easy_mesh_t::macbytes_to_string(m_radio_info.intf.mac, mac_str);
@@ -248,6 +256,10 @@ void dm_radio_t::operator = (const dm_radio_t& obj)
 
 int dm_radio_t::parse_radio_id_from_key(const char *key, em_radio_id_t *id)
 {
+	if (!key || !id) {
+		printf("%s:%d: Invalid key or id pointer\n", __func__, __LINE__);
+		return -1;
+	}
 	em_long_string_t   str;
     char *tmp, *remain;
     unsigned int i = 0;

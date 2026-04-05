@@ -51,6 +51,8 @@ unsigned int em_cmd_t::get_event_data_length()
 	em_bus_event_t *bevt;
 	unsigned int sz = 0;
 
+	if (!m_evt) return 0;
+
 	switch (m_evt->type) {
 		case em_event_type_frame:
 			fevt = &m_evt->u.fevt;
@@ -74,6 +76,8 @@ void em_cmd_t::set_event_data_length(unsigned int len)
 	em_frame_event_t *fevt;
 	em_bus_event_t *bevt;
 
+	if (!m_evt) return;
+
 	switch (m_evt->type) {
 		case em_event_type_frame:
 			fevt = &m_evt->u.fevt;
@@ -94,6 +98,8 @@ void em_cmd_t::copy_bus_event(em_bus_event_t *evt)
 {
 	em_bus_event_t *bevt;
 
+	if (!evt || !m_evt) return;
+
 	m_evt->type = em_event_type_bus;
 	bevt = &m_evt->u.bevt;
 	memcpy(bevt, evt, sizeof(em_bus_event_t));
@@ -103,6 +109,8 @@ void em_cmd_t::copy_bus_event(em_bus_event_t *evt)
 void em_cmd_t::copy_frame_event(em_frame_event_t *evt)
 {
 	em_frame_event_t *fevt;
+
+	if (!evt || !m_evt) return;
 
 	m_evt->type = em_event_type_frame;
 	fevt = &m_evt->u.fevt;
@@ -119,6 +127,7 @@ char *em_cmd_t::status_to_string(em_cmd_out_status_t status, char *str)
     char *tmp;
 
     evt = get_event();
+    if (!evt) return NULL;
     info = &evt->u.bevt.u.subdoc;
 
     obj = cJSON_CreateObject();
@@ -244,6 +253,8 @@ em_cmd_t *em_cmd_t::clone_for_next()
 void em_cmd_t::override_op(unsigned int index, em_orch_desc_t *desc)
 {
     em_cmd_ctx_t *ctx;
+
+    if (!desc) return;
 
     m_orch_desc[index].op = desc->op;
     m_orch_desc[index].submit = desc->submit;
