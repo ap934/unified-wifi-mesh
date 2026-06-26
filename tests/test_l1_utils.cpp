@@ -21,6 +21,7 @@
 #include <array>
 #include <sstream>
 #include <cctype>
+#include <stdexcept>
 
 MacAddress parseMacAddress(const std::string& macStr) {
     std::string cleaned;
@@ -29,10 +30,28 @@ MacAddress parseMacAddress(const std::string& macStr) {
             cleaned += c;
         }
     }
+    if (cleaned.size() != 12) {
+        throw std::invalid_argument("Invalid MAC address length");
+    }
+    for (char c : cleaned) {
+        if (!std::isxdigit(c)) {
+            throw std::invalid_argument("Invalid character in MAC address");
+        }
+    }
+    // Reject broadcast MAC (all FF)
+    bool all_ff = true;
+    for (char c : cleaned) {
+        if (c != 'f' && c != 'F') { all_ff = false; break; }
+    }
+    if (all_ff) {
+        throw std::invalid_argument("Broadcast MAC address not allowed");
+    }
     MacAddress mac{};
     for (size_t i = 0; i < 6; ++i) {
         std::string byteStr = cleaned.substr(i * 2, 2);
-        std::istringstream(byteStr) >> std::hex >> mac[i];
+        unsigned int val;
+        std::istringstream(byteStr) >> std::hex >> val;
+        mac[i] = static_cast<uint8_t>(val);
     }
     return mac;
 }

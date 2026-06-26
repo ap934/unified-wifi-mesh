@@ -38,28 +38,37 @@ int dm_op_class_t::decode(const cJSON *obj, void *parent_id)
 {
     cJSON *tmp, *non_op_array;
     unsigned int i;
+    bool found_field = false;
+
+    if (!parent_id) return -1;
+    if (!obj || !cJSON_IsObject(obj)) return -1;
 
     memset(&m_op_class_info, 0, sizeof(em_op_class_info_t));
     dm_op_class_t::parse_op_class_id_from_key(static_cast<char*>(parent_id), &m_op_class_info.id);
 	
     if ((tmp = cJSON_GetObjectItem(obj, "Class")) != NULL) {
         m_op_class_info.op_class = static_cast<unsigned int>(tmp->valuedouble);
+        found_field = true;
     }
 
     if ((tmp = cJSON_GetObjectItem(obj, "OpClass")) != NULL) {
         m_op_class_info.op_class = static_cast<unsigned int>(tmp->valuedouble);
+        found_field = true;
     }
 
     if ((tmp = cJSON_GetObjectItem(obj, "Channel")) != NULL) {
         m_op_class_info.channel = static_cast<unsigned int>(tmp->valuedouble);
+        found_field = true;
     }
 
     if ((tmp = cJSON_GetObjectItem(obj, "TxPower")) != NULL) {
         m_op_class_info.tx_power = static_cast<int>(tmp->valuedouble);
+        found_field = true;
     }
 
     if ((tmp = cJSON_GetObjectItem(obj, "MaxTxPower")) != NULL) {
        m_op_class_info.max_tx_power = static_cast<int>(tmp->valuedouble);
+       found_field = true;
     }
     
     m_op_class_info.num_channels = 0;
@@ -70,19 +79,25 @@ int dm_op_class_t::decode(const cJSON *obj, void *parent_id)
                 m_op_class_info.channels[i] = static_cast<unsigned int>(tmp->valuedouble);
             }
         }
+        found_field = true;
     }
 
     if ((tmp = cJSON_GetObjectItem(obj, "Minutes")) != NULL) {
        m_op_class_info.mins_since_cac_comp = static_cast<short unsigned int>(tmp->valuedouble);
+       found_field = true;
     }
 
     if ((tmp = cJSON_GetObjectItem(obj, "Seconds")) != NULL) {
        m_op_class_info.sec_remain_non_occ_dur = static_cast<short unsigned int>(tmp->valuedouble);
+       found_field = true;
     }
 
     if ((tmp = cJSON_GetObjectItem(obj, "Countdown")) != NULL) {
        m_op_class_info.countdown_cac_comp = static_cast<unsigned int>(tmp->valuedouble);
+       found_field = true;
     }
+
+    if (!found_field) return -1;
     return 0;
 
 }
@@ -187,6 +202,8 @@ int dm_op_class_t::parse_op_class_id_from_key(const char *key, em_op_class_id_t 
     char *tmp, *remain;
     unsigned int i = 0;
 
+    if (!key || !id) return -1;
+    if (key[0] == '\0') return -1;
     strncpy(str, key, strlen(key) + 1);
     remain = str;
     while ((tmp = strchr(remain, '@')) != NULL) {
@@ -204,12 +221,18 @@ int dm_op_class_t::parse_op_class_id_from_key(const char *key, em_op_class_id_t 
         i++;
     }
 
+    if (i < 2) return -1;
 	return 0;
 }
 
 dm_op_class_t::dm_op_class_t(em_op_class_info_t *op_class)
 {
+    memset(&m_op_class_info, 0, sizeof(em_op_class_info_t));
+    if (!op_class) return;
     memcpy(&m_op_class_info, op_class, sizeof(em_op_class_info_t));
+    if (m_op_class_info.num_channels > EM_MAX_CHANNELS_IN_LIST) {
+        m_op_class_info.num_channels = EM_MAX_CHANNELS_IN_LIST;
+    }
 }
 
 dm_op_class_t::dm_op_class_t(const dm_op_class_t& op_class)
@@ -220,6 +243,9 @@ dm_op_class_t::dm_op_class_t(const dm_op_class_t& op_class)
 dm_op_class_t::dm_op_class_t(const em_op_class_info_t& op_class_info)
 {
     memcpy(&m_op_class_info, &op_class_info, sizeof(em_op_class_info_t));
+    if (m_op_class_info.num_channels > EM_MAX_CHANNELS_IN_LIST) {
+        m_op_class_info.num_channels = EM_MAX_CHANNELS_IN_LIST;
+    }
 }
 
 dm_op_class_t::dm_op_class_t()

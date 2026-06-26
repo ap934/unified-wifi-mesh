@@ -31,12 +31,15 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include "dm_policy.h"
+#include <stdexcept>
 #include "dm_easy_mesh.h"
 #include "dm_easy_mesh_ctrl.h"
 #include "util.h"
 
 int dm_policy_t::decode(const cJSON *obj, void *parent_id, em_policy_id_type_t type)
 {
+    if (!obj || !cJSON_IsObject(obj)) return -1;
+    if (!parent_id) return -1;
     cJSON *tmp, *sta_arr_obj;
 	em_policy_id_t id;
 	int i;
@@ -204,6 +207,7 @@ int dm_policy_t::decode(const cJSON *obj, void *parent_id, em_policy_id_type_t t
 
 void dm_policy_t::encode(cJSON *obj, em_policy_id_type_t id)
 {
+    if (static_cast<int>(id) < 0 || id >= em_policy_id_type_max) { throw std::invalid_argument("invalid policy id"); }
     unsigned int i;
 	mac_addr_str_t	dev_mac_str, radio_mac_str, sta_mac_str;
 	cJSON *sta_arr_obj;
@@ -286,6 +290,8 @@ void dm_policy_t::operator = (const dm_policy_t& obj)
 
 int dm_policy_t::parse_dev_radio_mac_from_key(const char *key, em_policy_id_t *id)
 {
+    if (!key || !id) { return -1; }
+    if (key[0] == '\0') { return -1; }
     em_long_string_t   str;
     char *tmp, *remain;
     unsigned int i = 0;
@@ -300,23 +306,26 @@ int dm_policy_t::parse_dev_radio_mac_from_key(const char *key, em_policy_id_t *i
             remain = tmp;
         } else if (i == 1) {
             *tmp = 0;
+            if (strlen(remain) == 0) { return -1; }
 			dm_easy_mesh_t::string_to_macbytes(remain, id->dev_mac);
             tmp++;
 			remain = tmp;
         } else if (i == 2) {
             *tmp = 0;
+            if (strlen(remain) == 0) { return -1; }
 			dm_easy_mesh_t::string_to_macbytes(remain, id->radio_mac);
             tmp++;
 			id->type = static_cast<em_policy_id_type_t>(atoi(tmp));
 		}
         i++;
     }
-
+    if (i < 3) { return -1; }
     return 0;
 }
 
 dm_policy_t::dm_policy_t(em_policy_t *policy)
 {
+    if (!policy) { throw std::invalid_argument("policy is null"); }
     memcpy(&m_policy, policy, sizeof(em_policy_t));
 }
 

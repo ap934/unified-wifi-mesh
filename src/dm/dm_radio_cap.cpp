@@ -37,6 +37,8 @@
 
 int dm_radio_cap_t::decode(const cJSON *obj, void *parent_id)
 {
+    if (!obj || !cJSON_IsObject(obj)) return -1;
+    if (!parent_id) return -1;
     //cJSON *tmp;
     //unsigned int i;
     em_interface_t	*id = static_cast<em_interface_t *>(parent_id);
@@ -95,6 +97,9 @@ void dm_radio_cap_t::operator = (const dm_radio_cap_t& obj)
 
 dm_radio_cap_t::dm_radio_cap_t(em_radio_cap_info_t *radio_cap)
 {
+    memset(&m_radio_cap_info, 0, sizeof(em_radio_cap_info_t));
+    if (!radio_cap) return;
+
     memcpy(&m_radio_cap_info, radio_cap, sizeof(em_radio_cap_info_t));
 }
 

@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <assert.h>
+#include <stdexcept>
 #include <pthread.h>
 #include <cjson/cJSON.h>
 #include "em_network_topo.h"
@@ -36,9 +37,9 @@ void em_network_topo_t::encode(cJSON *parent)
 	cJSON *dev_obj, *child_obj, *radio_list_obj, *radio_obj, *bss_list_obj, *bss_obj, *bh_obj, *sta_list_obj;
 	unsigned int i, j;
 
+	if (!parent) { throw std::invalid_argument("parent is null"); }
 	if (m_data_model == NULL) {
-		em_printfout("Data model is NULL, cannot encode topology");
-		return;
+		throw std::invalid_argument("Data model is NULL");
 	}
 
 	dev_obj = cJSON_AddObjectToObject(parent, "Device");
@@ -194,6 +195,7 @@ em_network_topo_t *em_network_topo_t::find_topology_by_bss_mac(mac_address_t bss
 
 void em_network_topo_t::print_topology()
 {
+	if (!m_data_model) { throw std::invalid_argument("m_data_model is null"); }
 	std::string dev_mac_str = util::mac_to_string(m_data_model->m_device.m_device_info.intf.mac);
 	em_printfout("Network Topology of dev_mac:%s num_child_topologies:%d", dev_mac_str.c_str(), m_num_topologies);
 	em_printfout("---- Child Topologies[%s] <start> -----", dev_mac_str.c_str());
@@ -208,6 +210,8 @@ em_network_topo_t *em_network_topo_t::find_topology(dm_easy_mesh_t *dm)
 	unsigned int i;
 	em_network_topo_t *topo;
 	mac_addr_str_t tgt_dev_mac_str, src_dev_mac_str;
+
+	if (!dm) return nullptr;
 
 	dm_easy_mesh_t::macbytes_to_string(dm->m_device.m_device_info.intf.mac, tgt_dev_mac_str);
 	dm_easy_mesh_t::macbytes_to_string(m_data_model->m_device.m_device_info.intf.mac, src_dev_mac_str);
@@ -229,6 +233,7 @@ em_network_topo_t *em_network_topo_t::find_topology(dm_easy_mesh_t *dm)
 
 void em_network_topo_t::add_network_topo(dm_easy_mesh_t *dm, em_network_topo_t **child_topos, unsigned int num_child_topos)
 {
+	if (!dm) { throw std::invalid_argument("dm is null"); }
 	std::string dev_mac_str = util::mac_to_string(dm->m_device.m_device_info.intf.mac);
 	if (m_num_topologies >= EM_MAX_NETWORKS) {
 		em_printfout("Cannot add more topologies, max limit reached");
@@ -262,8 +267,7 @@ void em_network_topo_t::add(dm_easy_mesh_t *dm, em_network_topo_t **child_topos,
 {
 	em_network_topo_t *topo;
 	if (dm == NULL) {
-		em_printfout("dm is NULL, cannot add topology");
-		return;
+		throw std::invalid_argument("null dm");
 	}
 
 	// find the BH bss where al_mac of this device of data model is attached to.

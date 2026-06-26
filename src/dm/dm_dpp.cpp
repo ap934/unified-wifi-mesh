@@ -31,6 +31,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include "dm_dpp.h"
+#include <stdexcept>
 #include "em_cmd_start_dpp.h"
 #include "dm_easy_mesh.h"
 #include "ec_util.h"
@@ -140,6 +141,7 @@ void dm_dpp_t::operator = (const dm_dpp_t& obj)
 
 dm_dpp_t::dm_dpp_t(ec_data_t *dpp)
 {
+    if (!dpp) { throw std::invalid_argument("dpp is null"); }
     memcpy(&m_dpp_info, dpp, sizeof(ec_data_t));
 }
 

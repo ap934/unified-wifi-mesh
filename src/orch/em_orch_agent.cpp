@@ -16,6 +16,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <stdexcept>
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -41,6 +42,7 @@
 
 void em_orch_agent_t::orch_transient(em_cmd_t *pcmd, em_t *em)
 {
+    if (!pcmd || !em) return;
     em_cmd_stats_t *stats;
     em_short_string_t key;
     
@@ -153,6 +155,7 @@ bool em_orch_agent_t::is_em_ready_for_orch_fini(em_cmd_t *pcmd, em_t *em)
 
 bool em_orch_agent_t::is_em_ready_for_orch_exec(em_cmd_t *pcmd, em_t *em)
 {
+	if (!pcmd || !em) return false;
 	if (pcmd->m_type == em_cmd_type_dev_init) {
         return true;
     } else if (pcmd->m_type == em_cmd_type_onewifi_cb) {
@@ -200,11 +203,30 @@ bool em_orch_agent_t::is_em_ready_for_orch_exec(em_cmd_t *pcmd, em_t *em)
 
 void em_orch_agent_t::pre_process_cancel(em_cmd_t *pcmd, em_t *em)
 {
-
+    if (!pcmd || !em) return;
+    switch (pcmd->get_type()) {
+        case em_cmd_type_dev_init:
+        case em_cmd_type_onewifi_cb:
+        case em_cmd_type_cfg_renew:
+        case em_cmd_type_ap_cap_query:
+        case em_cmd_type_client_cap_query:
+        case em_cmd_type_channel_pref_query:
+        case em_cmd_type_op_channel_report:
+        case em_cmd_type_btm_report:
+        case em_cmd_type_sta_list:
+        case em_cmd_type_sta_link_metrics:
+        case em_cmd_type_scan_result:
+        case em_cmd_type_beacon_report:
+        case em_cmd_type_get_link_quality_report:
+            break;
+        default:
+            throw std::invalid_argument("unhandled command type");
+    }
 }
 
 bool em_orch_agent_t::pre_process_orch_op(em_cmd_t *pcmd)
 {
+    if (!pcmd) return false;
     em_t *em;
     em_cmd_ctx_t *ctx;
     em_interface_t *intf;
@@ -335,6 +357,7 @@ bool em_orch_agent_t::pre_process_orch_op(em_cmd_t *pcmd)
 
 unsigned int em_orch_agent_t::build_candidates(em_cmd_t *pcmd)
 {
+    if (!pcmd) return 0;
     em_t *em;
     unsigned int count = 0 , num = 0;
     em_cmd_ctx_t *ctx;
@@ -499,5 +522,6 @@ unsigned int em_orch_agent_t::build_candidates(em_cmd_t *pcmd)
 
 em_orch_agent_t::em_orch_agent_t(em_mgr_t *mgr)
 {
+    if (!mgr) throw std::invalid_argument("null manager");
     m_mgr = mgr;
 }  

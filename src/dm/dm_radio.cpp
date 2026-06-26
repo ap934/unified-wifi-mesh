@@ -31,6 +31,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include "dm_radio.h"
+#include <stdexcept>
 #include "dm_easy_mesh.h"
 #include "dm_easy_mesh_ctrl.h"
 
@@ -38,6 +39,8 @@
 
 int dm_radio_t::decode(const cJSON *obj, void *parent_id)
 {
+    if (!obj || !cJSON_IsObject(obj)) return -1;
+    if (!parent_id) return -1;
     cJSON *tmp;
     mac_addr_str_t  mac_str, dev_mac;
 
@@ -132,6 +135,8 @@ int dm_radio_t::decode(const cJSON *obj, void *parent_id)
 
 void dm_radio_t::encode(cJSON *obj, em_get_radio_list_reason_t reason)
 {
+    if (!obj) { throw std::invalid_argument("obj is null"); }
+    if (!cJSON_IsObject(obj)) { throw std::invalid_argument("obj is not a valid JSON object"); }
     mac_addr_str_t  mac_str;
 
     dm_easy_mesh_t::macbytes_to_string(m_radio_info.intf.mac, mac_str);
@@ -251,7 +256,9 @@ int dm_radio_t::parse_radio_id_from_key(const char *key, em_radio_id_t *id)
 	em_long_string_t   str;
     char *tmp, *remain;
     unsigned int i = 0;
-   
+
+    if (!key || !id) return -1;
+    if (key[0] == '\0') return -1;
     strncpy(str, key, strlen(key) + 1);
     remain = str;
     while ((tmp = strchr(remain, '@')) != NULL) {
@@ -269,7 +276,7 @@ int dm_radio_t::parse_radio_id_from_key(const char *key, em_radio_id_t *id)
         i++;
     }
    
-
+    if (i < 2) return -1;
     return 0;
 
 }
@@ -288,6 +295,8 @@ void dm_radio_t::dump_radio_info()
 
 dm_radio_t::dm_radio_t(em_radio_info_t *radio)
 {
+    if (!radio) { throw std::invalid_argument("radio is null"); }
+    if (static_cast<int>(radio->intf.media) < 0 || radio->intf.media >= em_media_type_max) { throw std::invalid_argument("invalid media type"); }
     memcpy(&m_radio_info, radio, sizeof(em_radio_info_t));
 }
 

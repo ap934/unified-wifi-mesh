@@ -36,6 +36,16 @@
 
 int dm_network_t::decode(const cJSON *obj, void *parent_id)
 {
+    if (!obj) {
+        return -1;
+    }
+    if (!parent_id) {
+        return -1;
+    }
+    if (obj->type < 0) {
+        return -1;
+    }
+
     cJSON *tmp;
     mac_addr_str_t  mac_str;
 
@@ -205,6 +215,10 @@ int dm_network_t::init()
 
 dm_network_t::dm_network_t(em_network_info_t *net)
 {
+    memset(&m_net_info, 0, sizeof(em_network_info_t));
+    if (!net) {
+        return;
+    }
     memcpy(&m_net_info, net, sizeof(em_network_info_t));
 }
 

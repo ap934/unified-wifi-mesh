@@ -31,12 +31,15 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include "dm_sta.h"
+#include <stdexcept>
 #include "dm_easy_mesh.h"
 #include "dm_easy_mesh_ctrl.h"
 #include "util.h"
 
 int dm_sta_t::decode(const cJSON *obj, void *parent_id)
 {
+    if (!obj || !cJSON_IsObject(obj)) return -1;
+    if (!parent_id) return -1;
     cJSON *tmp;
     mac_addr_str_t  mac_str;
 
@@ -148,6 +151,8 @@ int dm_sta_t::decode(const cJSON *obj, void *parent_id)
 
 void dm_sta_t::encode(cJSON *obj, em_get_sta_list_reason_t reason)
 {
+    if (!obj) { throw std::invalid_argument("obj is null"); }
+    if (!cJSON_IsObject(obj)) { throw std::invalid_argument("obj is not a valid JSON object"); }
     mac_addr_str_t  mac_str;
     cJSON *reason_obj, *request_obj;
 
@@ -272,6 +277,8 @@ void dm_sta_t::encode(cJSON *obj, em_get_sta_list_reason_t reason)
 
 void dm_sta_t::encode_beacon_report(cJSON *obj)
 {
+    if (!obj) { throw std::invalid_argument("obj is null"); }
+    if (!cJSON_IsObject(obj)) { throw std::invalid_argument("obj is not a valid JSON object"); }
 	mac_addr_str_t mac_str;
     cJSON *neighbors_arr_obj, *neighbor_obj;
 	unsigned int i;
@@ -374,6 +381,7 @@ void dm_sta_t::parse_sta_bss_radio_from_key(const char *key, mac_address_t sta, 
     char *tmp, *remain;
     unsigned int i = 0;
 
+    if (!key) return;
     strncpy(str, key, strlen(key) + 1);
     remain = str;
     while ((tmp = strchr(remain, '@')) != NULL) {
@@ -394,6 +402,11 @@ void dm_sta_t::parse_sta_bss_radio_from_key(const char *key, mac_address_t sta, 
 
 void dm_sta_t::decode_sta_capability(dm_sta_t *sta)
 {
+    if (!sta) { throw std::invalid_argument("sta is null"); }
+    mac_address_t zero_mac = {0};
+    if (memcmp(sta->m_sta_info.id + 3, zero_mac, 3) == 0 && memcmp(sta->m_sta_info.id, zero_mac, 3) != 0) {
+        throw std::invalid_argument("invalid MAC address");
+    }
     unsigned int offset = 0;
     unsigned char length;
     tag_type_t tag_id;
@@ -527,6 +540,10 @@ void dm_sta_t::decode_sta_capability(dm_sta_t *sta)
 
 void dm_sta_t::decode_beacon_report(dm_sta_t *sta)
 {
+    if (!sta) { throw std::invalid_argument("sta is null"); }
+    if (sta->m_sta_info.beacon_report_len > EM_MAX_BEACON_MEASUREMENT_LEN) {
+        throw std::invalid_argument("invalid beacon report length");
+    }
     unsigned int i =0;
     unsigned char *ie;
     int current_pkt_len = 0;
@@ -551,6 +568,11 @@ void dm_sta_t::decode_beacon_report(dm_sta_t *sta)
 
 dm_sta_t::dm_sta_t(em_sta_info_t *sta)
 {
+    if (!sta) { throw std::invalid_argument("sta is null"); }
+    mac_address_t zero_mac = {0};
+    if (memcmp(sta->id + 3, zero_mac, 3) == 0 && memcmp(sta->id, zero_mac, 3) != 0) {
+        throw std::invalid_argument("invalid MAC address");
+    }
     memcpy(&m_sta_info, sta, sizeof(em_sta_info_t));
 }
 

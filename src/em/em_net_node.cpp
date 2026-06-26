@@ -33,21 +33,26 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <cjson/cJSON.h>
+#include <stdexcept>
 #include "em_net_node.h"
 #include "em_cmd_exec.h"
 
 em_network_node_data_type_t em_net_node_t::get_node_type(em_network_node_t *node)
 {
+    if (!node) return em_network_node_data_type_invalid;
     return node->type;
 }
 
 void em_net_node_t::free_node_value(char *str)
 {
+    if (!str) { throw std::invalid_argument("str is null"); }
     free(str);
 }
 
 char *em_net_node_t::get_node_array_value(em_network_node_t *node, em_network_node_data_type_t *type)
 {
+    if (!node) return nullptr;
+    if (!type) return nullptr;
     char *str;
     em_2xlong_string_t tmp_str;
     unsigned int i;
@@ -81,6 +86,8 @@ char *em_net_node_t::get_node_array_value(em_network_node_t *node, em_network_no
 
 void em_net_node_t::set_node_array_value(em_network_node_t *node, char *fmt)
 {
+	if (!node) { throw std::invalid_argument("node is null"); }
+	if (!fmt) { throw std::invalid_argument("fmt is null"); }
 	em_long_string_t value;
 	char *tmp, *remain;
 	em_network_node_data_type_t arrType = em_network_node_data_type_invalid;
@@ -150,6 +157,7 @@ void em_net_node_t::set_node_array_value(em_network_node_t *node, char *fmt)
 
 char *em_net_node_t::get_node_scalar_value(em_network_node_t *node)
 {
+    if (!node) return nullptr;
     char *str;
 
     str = static_cast<char *> (malloc(sizeof(em_long_string_t)));
@@ -199,6 +207,8 @@ char *em_net_node_t::get_node_scalar_value(em_network_node_t *node)
 
 void em_net_node_t::set_node_scalar_value(em_network_node_t *node, char *fmt)
 {
+	if (!node) { throw std::invalid_argument("node is null"); }
+	if (!fmt) { throw std::invalid_argument("fmt is null"); }
 	switch (node->type) {
 		case em_network_node_data_type_false:
 			node->value_int = 0;
@@ -223,6 +233,9 @@ void em_net_node_t::set_node_scalar_value(em_network_node_t *node, char *fmt)
 
 void em_net_node_t::get_network_tree_node_string(char *str, em_network_node_t *node, unsigned int *pident)
 {
+    if (!str) { throw std::invalid_argument("str is null"); }
+    if (!node) { throw std::invalid_argument("node is null"); }
+    if (!pident) { throw std::invalid_argument("pident is null"); }
     unsigned int i, ident = 0;
     em_long_string_t fmt = {0};
     em_3xlong_string_t string = {0};
@@ -350,6 +363,7 @@ void em_net_node_t::get_network_tree_node_string(char *str, em_network_node_t *n
 
 char *em_net_node_t::get_network_tree_string(em_network_node_t *node)
 {
+    if (!node) return nullptr;
     unsigned int ident = 0;
     unsigned int size = EM_LONG_IO_BUFF_SZ;
     char *str;
@@ -364,6 +378,8 @@ char *em_net_node_t::get_network_tree_string(em_network_node_t *node)
 
 cJSON *em_net_node_t::network_tree_node_to_json(em_network_node_t *node, cJSON *parent)
 {
+    if (!node) return nullptr;
+    if (!parent) return nullptr;
     unsigned int i;
     cJSON *obj = NULL;
 
@@ -423,6 +439,7 @@ cJSON *em_net_node_t::network_tree_node_to_json(em_network_node_t *node, cJSON *
 
 void *em_net_node_t::network_tree_to_json(em_network_node_t *root)
 {
+    if (!root) return nullptr;
     cJSON *obj;
     unsigned int i;
 
@@ -441,6 +458,9 @@ void *em_net_node_t::network_tree_to_json(em_network_node_t *root)
 
 int em_net_node_t::get_network_tree_node(cJSON *obj, em_network_node_t *root, unsigned int *node_display_ctr)
 {
+    if (!obj) return -1;
+    if (!root) return -1;
+    if (!node_display_ctr) return -1;
     cJSON *child_obj, *tmp_obj;
     size_t sz = 0;
 
@@ -694,6 +714,7 @@ em_network_node_t *em_net_node_t::get_network_tree_by_file(const char *file_name
 
 void em_net_node_t::free_network_tree_node(em_network_node_t *node)
 {
+    if (!node) { throw std::invalid_argument("node is null"); }
     unsigned int i;
 
     for (i = 0; i < node->num_children; i++) {
@@ -705,6 +726,7 @@ void em_net_node_t::free_network_tree_node(em_network_node_t *node)
 
 void em_net_node_t::free_network_tree(em_network_node_t *node)
 {
+    if (!node) { throw std::invalid_argument("node is null"); }
     free_network_tree_node(node);
 }
 
@@ -716,11 +738,13 @@ em_network_node_t *em_net_node_t::get_child_node_at_index(em_network_node_t *nod
 
 unsigned int em_net_node_t::get_node_display_position(em_network_node_t *node)
 {
+    if (!node) return 0;
     return node->display_info.node_pos;
 }
 
 em_network_node_t *em_net_node_t::get_network_tree_by_key(em_network_node_t *node, em_long_string_t key)
 {
+	if (!node) return nullptr;
 	unsigned int i;
 	em_network_node_t *tmp;
 

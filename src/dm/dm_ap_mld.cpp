@@ -31,12 +31,16 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include "dm_ap_mld.h"
+#include <stdexcept>
 #include "dm_easy_mesh.h"
 #include "dm_easy_mesh_ctrl.h"
 #include "util.h"
 
 int dm_ap_mld_t::decode(const cJSON *obj, void *parent_id)
 {
+    if (obj == nullptr || parent_id == nullptr || !cJSON_IsObject(obj)) {
+        return -1;
+    }
     //TODO: needs to be implemnented
 
     return 0;
@@ -44,6 +48,9 @@ int dm_ap_mld_t::decode(const cJSON *obj, void *parent_id)
 
 void dm_ap_mld_t::encode(cJSON *obj)
 {
+    if (obj == nullptr) {
+        throw std::invalid_argument("encode: obj is null");
+    }
     //TODO: needs to be implemnented
 }
 
@@ -92,8 +99,7 @@ dm_ap_mld_t::dm_ap_mld_t(em_ap_mld_info_t *ap_mld_info)
 {
     memset(&m_ap_mld_info, 0, sizeof(em_ap_mld_info_t));
     if (ap_mld_info == nullptr) {
-        em_printfout("Error: ap_mld_info is null");
-        return;
+        throw std::invalid_argument("ap_mld_info is null");
     }
     memcpy(&m_ap_mld_info, ap_mld_info, sizeof(em_ap_mld_info_t));
 }

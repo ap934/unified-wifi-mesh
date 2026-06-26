@@ -582,6 +582,10 @@ bool ec_enrollee_t::handle_recfg_auth_confirm(ec_frame_t *frame, size_t len, uin
 
 bool ec_enrollee_t::handle_auth_request(ec_frame_t *frame, size_t len, uint8_t src_mac[ETHER_ADDR_LEN], unsigned int recv_freq)
 {
+    if (!frame || !src_mac) {
+        return false;
+    }
+
     em_printfout("Recieved a DPP Authentication Request from '" MACSTRFMT "', stopping Presence Announcement\n", MAC2STR(src_mac));
     // Halt presence announcement once DPP Authentication frame is received.
     m_received_auth_frame.store(true);
@@ -763,6 +767,10 @@ Authentication Request frame without replying to it.
 
 bool ec_enrollee_t::handle_auth_confirm(ec_frame_t *frame, size_t len, uint8_t src_mac[ETHER_ADDR_LEN])
 {
+    if (!frame || !src_mac) {
+        return false;
+    }
+
     size_t attrs_len = len - EC_FRAME_BASE_SIZE;
 
     auto status_attrib = ec_util::get_attrib(frame->attributes, attrs_len, ec_attrib_id_dpp_status);

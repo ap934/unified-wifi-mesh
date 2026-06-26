@@ -30,13 +30,22 @@
 #include <sys/uio.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <stdexcept>
 #include "dm_tid_to_link.h"
 #include "dm_easy_mesh.h"
 #include "dm_easy_mesh_ctrl.h"
 
 int dm_tid_to_link_t::decode(const cJSON *obj, void *parent_id)
 {
-    //TODO: needs to be implemnented
+    if (!obj) {
+        return -1;
+    }
+    if (!parent_id) {
+        return -1;
+    }
+    if (!(obj->type & (cJSON_Object | cJSON_Array))) {
+        return -1;
+    }
 
     return 0;
 }
@@ -74,7 +83,14 @@ bool dm_tid_to_link_t::operator == (const dm_tid_to_link_t& obj)
 
 dm_tid_to_link_t::dm_tid_to_link_t(em_tid_to_link_info_t *tid_to_link_info)
 {
+    memset(&m_tid_to_link_info, 0, sizeof(em_tid_to_link_info_t));
+    if (!tid_to_link_info) {
+        return;
+    }
     memcpy(&m_tid_to_link_info, tid_to_link_info, sizeof(em_tid_to_link_info_t));
+    if (m_tid_to_link_info.num_mapping > EM_MAX_AP_MLD) {
+        m_tid_to_link_info.num_mapping = 0;
+    }
 }
 
 dm_tid_to_link_t::dm_tid_to_link_t(const dm_tid_to_link_t& tid_to_link)

@@ -31,9 +31,12 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include "dm_ieee_1905_security.h"
+#include <stdexcept>
 
 int dm_ieee_1905_security_t::decode(const cJSON *obj)
 {
+    if (!obj) { return -1; }
+    if (obj->type <= 0) { return -1; }
     cJSON *tmp;
 
     if ((tmp = cJSON_GetObjectItem(obj, "OnboardingProtocol")) != NULL) {
@@ -96,6 +99,7 @@ void dm_ieee_1905_security_t::operator = (const dm_ieee_1905_security_t& obj)
 
 dm_ieee_1905_security_t::dm_ieee_1905_security_t(em_ieee_1905_security_info_t *ieee_1905_security)
 {
+    if (!ieee_1905_security) { throw std::invalid_argument("ieee_1905_security is null"); }
     memcpy(&m_ieee_1905_security_info, ieee_1905_security, sizeof(em_ieee_1905_security_info_t));
 }
 

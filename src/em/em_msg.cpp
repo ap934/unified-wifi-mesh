@@ -51,6 +51,7 @@ bool em_msg_t::get_tlv(em_tlv_t *itlv)
 
 bool em_msg_t::get_client_mac_info(mac_address_t *mac)
 {
+    if (!mac) return false;
     em_tlv_t    *tlv;
     unsigned int len;
     em_client_info_t *cltinfo;
@@ -88,6 +89,7 @@ bool em_msg_t::get_al_mac_address(unsigned char *mac)
 
 bool em_msg_t::get_profile(em_profile_type_t *profile)
 {
+    if (!profile) return false;
     em_tlv_t    *tlv;
     unsigned int len;
 
@@ -107,6 +109,7 @@ bool em_msg_t::get_profile(em_profile_type_t *profile)
 
 bool em_msg_t::get_bss_id(mac_address_t *mac)
 {
+    if (!mac) return false;
     em_tlv_t    *tlv;
     unsigned int len;
 
@@ -138,6 +141,7 @@ bool em_msg_t::get_bss_id(mac_address_t *mac)
 
 bool em_msg_t::get_radio_id(mac_address_t *mac)
 {
+    if (!mac) return false;
     em_tlv_t    *tlv;
     unsigned int len;
 	unsigned int num_radios = 0;
@@ -239,6 +243,7 @@ bool em_msg_t::get_freq_band(em_freq_band_t *band)
 
 bool em_msg_t::get_profile_type(em_profile_type_t *profile)
 {
+    if (!profile) return false;
     em_tlv_t    *tlv;
     unsigned int len;
 
@@ -348,6 +353,8 @@ em_tlv_t *em_msg_t::get_next_tlv(em_tlv_t* tlv, em_tlv_t* tlvs_buff, unsigned in
 
 unsigned char* em_msg_t::add_buff_element(unsigned char *buff, unsigned int *len, unsigned char *element, unsigned int element_len)
 {
+    if (!buff || !len) return nullptr;
+    if (!element && element_len > 0) return nullptr;
     memcpy(buff, element, element_len);
     *len += element_len;
     return buff + element_len;
@@ -356,6 +363,8 @@ unsigned char* em_msg_t::add_buff_element(unsigned char *buff, unsigned int *len
 unsigned char* em_msg_t::add_tlv(unsigned char *buff, unsigned int *len, em_tlv_type_t tlv_type, 
                                             unsigned char *value, unsigned int value_len)
 {
+    if (!buff || !len) return nullptr;
+    if (!value && value_len > 0) return nullptr;
     em_tlv_t* tlv = reinterpret_cast<em_tlv_t *> (buff);
     tlv->type = tlv_type;
     tlv->len = (htons(static_cast<short unsigned int>(value_len)));
@@ -369,6 +378,7 @@ unsigned char* em_msg_t::add_tlv(unsigned char *buff, unsigned int *len, em_tlv_
 }
 unsigned char* em_msg_t::add_1905_header(unsigned char *buff, unsigned int *len, mac_addr_t dst, mac_addr_t src, em_msg_type_t msg_type, unsigned short msg_id)
 {
+    if (!buff || !len) return nullptr;
 
     uint16_t type = htons(ETH_P_1905);
 

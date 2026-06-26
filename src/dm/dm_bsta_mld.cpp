@@ -33,9 +33,16 @@
 #include "dm_bsta_mld.h"
 #include "dm_easy_mesh.h"
 #include "dm_easy_mesh_ctrl.h"
+#include <stdexcept>
 
 int dm_bsta_mld_t::decode(const cJSON *obj, void *parent_id)
 {
+    if (obj == nullptr || parent_id == nullptr || !cJSON_IsObject(obj)) {
+        return -1;
+    }
+    if (obj->child == nullptr) {
+        return -1;
+    }
     //TODO: needs to be implemnented
 
     return 0;
@@ -43,6 +50,12 @@ int dm_bsta_mld_t::decode(const cJSON *obj, void *parent_id)
 
 void dm_bsta_mld_t::encode(cJSON *obj)
 {
+    if (obj == nullptr) {
+        throw std::invalid_argument("encode: obj is null");
+    }
+    if (!cJSON_IsObject(obj)) {
+        throw std::invalid_argument("encode: obj is not a JSON object");
+    }
     //TODO: needs to be implemnented
 }
 
@@ -99,7 +112,7 @@ dm_bsta_mld_t::dm_bsta_mld_t(em_bsta_mld_info_t *bsta_mld_info)
 {
     memset(&m_bsta_mld_info, 0, sizeof(em_bsta_mld_info_t));
     if (bsta_mld_info == nullptr) {
-        return;
+        throw std::invalid_argument("bsta_mld_info is null");
     }
     memcpy(&m_bsta_mld_info, bsta_mld_info, sizeof(em_bsta_mld_info_t));
 }

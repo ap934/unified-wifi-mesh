@@ -22,7 +22,32 @@
 #include <errno.h>
 #include <assert.h>
 #include <signal.h>
+#include <ctype.h>
 #include "db_column.h"
+
+static void sanitize_column_name(char *dest, size_t dest_size, const char *src)
+{
+    const size_t max_name_len = 32;
+    size_t limit = (dest_size < max_name_len) ? dest_size : max_name_len;
+
+    if (!src || src[0] == '\0') {
+        snprintf(dest, dest_size, "unnamed");
+        return;
+    }
+
+    size_t j = 0;
+    for (size_t i = 0; src[i] != '\0' && j < limit - 1; i++) {
+        char c = src[i];
+        if (isalnum((unsigned char)c) || c == '_') {
+            dest[j++] = c;
+        }
+    }
+    if (j == 0) {
+        snprintf(dest, dest_size, "unnamed");
+        return;
+    }
+    dest[j] = '\0';
+}
 
 void db_column_t::operator = (const db_column_t& col)
 {
@@ -34,7 +59,7 @@ void db_column_t::operator = (const db_column_t& col)
 
 db_column_t::db_column_t(const db_column_name_t name, const db_data_type_t type, const db_data_type_args_t args)
 {
-    snprintf(m_name, sizeof(m_name), "%s", name);
+    sanitize_column_name(m_name, sizeof(m_name), name);
     m_type = type;
     m_type_args = args;
 }

@@ -814,7 +814,7 @@ public:
 	 *
 	 * @note This function modifies the interface name used by the network control agent.
 	 */
-	void set_ctrl_al_interface_name(char *name) { snprintf(m_network.m_net_info.ctrl_id.name, sizeof(m_network.m_net_info.ctrl_id.name), "%s", name); }
+	void set_ctrl_al_interface_name(char *name) { if (!name) throw std::invalid_argument("name is null"); snprintf(m_network.m_net_info.ctrl_id.name, sizeof(m_network.m_net_info.ctrl_id.name), "%s", name); }
 	
 	/**!
 	 * @brief Sets the controller ID for the network.
@@ -1173,7 +1173,7 @@ public:
 	 *
 	 * @note Ensure that the index is within the valid range of the array.
 	 */
-	dm_network_ssid_t *get_network_ssid(unsigned int index) { return &m_network_ssid[index]; }
+	dm_network_ssid_t *get_network_ssid(unsigned int index) { if (index >= EM_MAX_NET_SSIDS) return nullptr; return &m_network_ssid[index]; }
     
 	/**!
 	 * @brief Retrieves the network SSID by reference for a given index.
@@ -1503,7 +1503,7 @@ public:
 	 *
 	 * @note Ensure that the index is within the valid range of the policy array.
 	 */
-	dm_policy_t *get_policy(unsigned int index) { return &m_policy[index]; }
+	dm_policy_t *get_policy(unsigned int index) { if (index >= EM_MAX_POLICIES) throw std::out_of_range("policy index out of range"); return &m_policy[index]; }
     
 	/**!
 	 * @brief Retrieves a reference to the policy at the specified index.
@@ -1626,7 +1626,7 @@ public:
 	 *
 	 * @returns The number of AP MLDs.
 	 */
-	static unsigned int get_num_ap_mld(void *dm) { return (static_cast<dm_easy_mesh_t *>(dm))->get_num_ap_mld(); }
+	static unsigned int get_num_ap_mld(void *dm) { if (!dm) throw std::invalid_argument("dm is null"); return (static_cast<dm_easy_mesh_t *>(dm))->get_num_ap_mld(); }
     
 	/**!
 	 * @brief Sets the number of AP MLD.
@@ -1660,7 +1660,7 @@ public:
 	 *
 	 * @note Ensure that the index is within the valid range to avoid undefined behavior.
 	 */
-	dm_ap_mld_t *get_ap_mld(unsigned int index) { return &m_ap_mld[index]; }
+	dm_ap_mld_t *get_ap_mld(unsigned int index) { if (index >= EM_MAX_AP_MLD) throw std::out_of_range("ap_mld index out of range"); return &m_ap_mld[index]; }
     
 	/**!
 	 * @brief Retrieves a reference to the AP MLD at the specified index.
@@ -1739,7 +1739,7 @@ public:
 	static unsigned int get_num_assoc_sta_mld(void *dm) { return (static_cast<dm_easy_mesh_t *>(dm))->get_num_assoc_sta_mld(); }
 
 	em_ap_mld_info_t *get_ap_mld_frm_bssid(mac_address_t bss_id);
-	static em_ap_mld_info_t *get_ap_mld_frm_bssid(void *dm, mac_address_t bss_id) { return (static_cast<dm_easy_mesh_t *>(dm))->get_ap_mld_frm_bssid(bss_id); }
+	static em_ap_mld_info_t *get_ap_mld_frm_bssid(void *dm, mac_address_t bss_id) { if (!dm) throw std::invalid_argument("dm is null"); return (static_cast<dm_easy_mesh_t *>(dm))->get_ap_mld_frm_bssid(bss_id); }
 
 	void update_ap_mld_info(em_ap_mld_info_t *ap_mld_info);
 	static void update_ap_mld_info(void *dm, em_ap_mld_info_t *ap_mld_info) { (static_cast<dm_easy_mesh_t *>(dm))->update_ap_mld_info(ap_mld_info); }
@@ -1753,7 +1753,7 @@ public:
 	void remove_assoc_sta_mld_info(mac_address_t sta_mld_mac);
 
 	em_radio_cap_info_t *get_radio_cap_info(unsigned int index);
-	static em_radio_cap_info_t *get_radio_cap_info(void *dm, unsigned int index) { return (static_cast<dm_easy_mesh_t *>(dm))->get_radio_cap_info(index); }
+	static em_radio_cap_info_t *get_radio_cap_info(void *dm, int index) { return (static_cast<dm_easy_mesh_t *>(dm))->get_radio_cap_info(static_cast<unsigned int>(index)); }
 
 	/**!
 	 * @brief Retrieves the Data Model DPP object.
@@ -1814,7 +1814,7 @@ public:
 	 *
 	 * @note Ensure that the index is within the valid range of available radio interfaces.
 	 */
-	em_interface_t *get_radio_interface(unsigned int index) { return m_radio[index].get_radio_interface(); }
+	em_interface_t *get_radio_interface(unsigned int index) { if (index >= EM_MAX_BANDS) return nullptr; return m_radio[index].get_radio_interface(); }
     
 	/**!
 	 * @brief Retrieves the radio information for a given index.
@@ -2596,7 +2596,7 @@ public:
 	 *
 	 * @note Ensure that the pointer is valid and points to a properly initialized Easy Mesh object.
 	 */
-	void set_em(em_t *em) { m_em = em; }
+	void set_em(em_t *em) { if (!em) throw std::invalid_argument("em is null"); m_em = em; }
     
 	/**!
 	 * @brief Sets the colocated status.

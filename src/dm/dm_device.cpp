@@ -34,9 +34,16 @@
 #include "dm_easy_mesh.h"
 #include "dm_easy_mesh_ctrl.h"
 #include "util.h"
+#include <stdexcept>
 
 int dm_device_t::decode(const cJSON *obj, void *parent_id)
 {
+    if (obj == nullptr || parent_id == nullptr) {
+        return -1;
+    }
+    if (!cJSON_IsObject(obj) || obj->child == nullptr) {
+        return -1;
+    }
     cJSON *tmp, *tmp_arr;
     mac_addr_str_t  mac_str;
     int i;
@@ -262,9 +269,13 @@ dm_orch_type_t dm_device_t::get_dm_orch_type(const dm_device_t& device)
 void dm_device_t::operator = (const dm_device_t& obj) {
 
     if (this == &obj) { return; }
+    memcpy(&this->m_device_info.id.dev_mac, &obj.m_device_info.id.dev_mac, sizeof(mac_address_t));
+    this->m_device_info.id.media = obj.m_device_info.id.media;
     memcpy(&this->m_device_info.intf.mac ,&obj.m_device_info.intf.mac,sizeof(mac_address_t));
     memcpy(&this->m_device_info.intf.name,&obj.m_device_info.intf.name,sizeof(em_interface_name_t));
+    this->m_device_info.intf.media = obj.m_device_info.intf.media;
     memcpy(&this->m_device_info.id.net_id,&obj.m_device_info.id.net_id,sizeof(em_long_string_t));
+    this->m_device_info.profile = obj.m_device_info.profile;
     memcpy(&this->m_device_info.multi_ap_cap,&obj.m_device_info.multi_ap_cap,sizeof(em_long_string_t));
     this->m_device_info.coll_interval = obj.m_device_info.coll_interval;
     this->m_device_info.report_unsuccess_assocs = obj.m_device_info.report_unsuccess_assocs;
@@ -299,9 +310,13 @@ void dm_device_t::operator = (const dm_device_t& obj) {
 bool dm_device_t::operator == (const dm_device_t& obj)
 {
     int ret = 0;
+    ret += (memcmp(&this->m_device_info.id.dev_mac, &obj.m_device_info.id.dev_mac, sizeof(mac_address_t)) != 0);
+    ret += !(this->m_device_info.id.media == obj.m_device_info.id.media);
     ret += (memcmp(&this->m_device_info.intf.mac ,&obj.m_device_info.intf.mac,sizeof(mac_address_t)) != 0);
     ret += (memcmp(&this->m_device_info.intf.name,&obj.m_device_info.intf.name,sizeof(em_interface_name_t)) != 0);
+    ret += !(this->m_device_info.intf.media == obj.m_device_info.intf.media);
     ret += (memcmp(&this->m_device_info.id.net_id,&obj.m_device_info.id.net_id,sizeof(em_long_string_t)) != 0);
+    ret += !(this->m_device_info.profile == obj.m_device_info.profile);
     ret += (memcmp(&this->m_device_info.multi_ap_cap,&obj.m_device_info.multi_ap_cap,sizeof(em_long_string_t)) != 0);
     ret += !(this->m_device_info.coll_interval == obj.m_device_info.coll_interval);
     ret += !(this->m_device_info.report_unsuccess_assocs == obj.m_device_info.report_unsuccess_assocs);
@@ -338,6 +353,12 @@ bool dm_device_t::operator == (const dm_device_t& obj)
 
 int dm_device_t::parse_device_id_from_key(const char *key, em_device_id_t *id)
 {
+    if (!key || !id) {
+        return -1;
+    }
+    if (key[0] == '\0') {
+        return -1;
+    }
 	em_long_string_t   str;
     char *tmp, *remain;
     unsigned int i = 0;
@@ -357,6 +378,10 @@ int dm_device_t::parse_device_id_from_key(const char *key, em_device_id_t *id)
             id->media = static_cast<em_media_type_t> (atoi(tmp));
         }  
         i++;
+    }
+
+    if (i < 2) {
+        return -1;
     }
 
 	return 0;
@@ -404,8 +429,7 @@ dm_device_t::dm_device_t(em_device_info_t *dev)
 {
     memset(&m_device_info, 0, sizeof(em_device_info_t));
     if ( dev == nullptr ) {
-        em_printfout("Error: device_info is null");
-        return;
+        throw std::invalid_argument("device_info is null");
     }
     memcpy(&m_device_info, dev, sizeof(em_device_info_t));
 }

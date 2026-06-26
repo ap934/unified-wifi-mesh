@@ -32,6 +32,9 @@ ec_manager_t::~ec_manager_t()
 
 bool ec_manager_t::handle_recv_ec_action_frame(ec_frame_t *frame, size_t len, uint8_t src_mac[ETHER_ADDR_LEN], unsigned int recv_freq)
 {
+    if (!frame || !src_mac) {
+        return false;
+    }
     if (!ec_util::validate_frame(frame)) {
         em_printfout("frame validation failed");
         return false;
@@ -80,7 +83,7 @@ bool ec_manager_t::handle_recv_ec_action_frame(ec_frame_t *frame, size_t len, ui
 }
 
 bool ec_manager_t::handle_recv_gas_pub_action_frame(ec_gas_frame_base_t *frame, size_t len, uint8_t source_addr[ETH_ALEN]) {
-    if (!frame) {
+    if (!frame || !source_addr) {
         em_printfout("EC manager given a NULL DPP GAS frame!");
         return false;
     }

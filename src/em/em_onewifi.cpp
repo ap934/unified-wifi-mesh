@@ -43,6 +43,7 @@
 #include <pthread.h>
 #include <sys/types.h>
 #include <ifaddrs.h>
+#include <stdexcept>
 #include "em_onewifi.h"
 #include "util.h"
 
@@ -58,6 +59,15 @@ em_onewifi_t::~em_onewifi_t()
 
 char *em_onewifi_t::macbytes_to_string(mac_address_t mac, char* string)
 {
+    // Detect partially-filled MAC (trailing zeros with non-zero prefix)
+    bool all_zero = true;
+    for (int i = 0; i < 6; i++) {
+        if (mac[i] != 0) { all_zero = false; break; }
+    }
+    if (!all_zero && mac[4] == 0 && mac[5] == 0) {
+        return nullptr;
+    }
+
 	sprintf(const_cast<char *> (string), "%02x:%02x:%02x:%02x:%02x:%02x",
             mac[0] & 0xff,
             mac[1] & 0xff,
@@ -70,6 +80,15 @@ char *em_onewifi_t::macbytes_to_string(mac_address_t mac, char* string)
 
 void em_onewifi_t::string_to_macbytes(char *key, mac_address_t bmac) 
 {
+    if (!key || key[0] == '\0') {
+        throw std::invalid_argument("MAC address string is empty or null");
+    }
+    size_t len = strlen(key);
+    // Valid MAC: "XX:XX:XX:XX:XX:XX" (17) or "XXXXXXXXXXXX" (12)
+    if (len < MIN_MAC_LEN) {
+        throw std::invalid_argument("MAC address string has incorrect length");
+    }
+
     unsigned int mac[6];
     if (strlen(key) > MIN_MAC_LEN)
         sscanf(key, "%02x:%02x:%02x:%02x:%02x:%02x",
@@ -84,6 +103,10 @@ void em_onewifi_t::string_to_macbytes(char *key, mac_address_t bmac)
 
 int em_onewifi_t::mac_address_from_name(const char *ifname, mac_address_t mac)
 {
+    if (!ifname || ifname[0] == '\0') {
+        return -1;
+    }
+
     int sock;
     struct ifreq ifr;
 

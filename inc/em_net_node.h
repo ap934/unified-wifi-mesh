@@ -19,6 +19,7 @@
 #ifndef EM_NET_NODE_H
 #define EM_NET_NODE_H
 
+#include <stdexcept>
 #include "em_base.h"
 
 class em_net_node_t {
@@ -304,7 +305,7 @@ public:
 	 * @note Ensure that the pointer passed to this function was allocated
 	 *       dynamically and is not NULL to avoid undefined behavior.
 	 */
-	static void free_network_tree_string(char *str) { free(str); }
+	static void free_network_tree_string(char *str) { if (!str) { throw std::invalid_argument("str is null"); } free(str); }
     
 	/**!
 	 * @brief Retrieves the network tree node string.

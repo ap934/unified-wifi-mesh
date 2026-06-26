@@ -35,6 +35,7 @@
 #include <cjson/cJSON.h>
 #include <type_traits>
 #include "em_cmd.h"
+#include <stdexcept>
 
 bool em_cmd_t::validate()
 {
@@ -48,6 +49,7 @@ bool em_cmd_t::validate()
 
 unsigned int em_cmd_t::get_event_data_length()
 {
+        if (!m_evt) { return 0; }
 	em_frame_event_t *fevt;
 	em_bus_event_t *bevt;
 	unsigned int sz = 0;
@@ -93,6 +95,7 @@ void em_cmd_t::set_event_data_length(unsigned int len)
 
 void em_cmd_t::copy_bus_event(em_bus_event_t *evt)
 {
+        if (!evt) { throw std::invalid_argument("evt is null"); }
 	em_bus_event_t *bevt;
 
 	m_evt->type = em_event_type_bus;
@@ -103,6 +106,7 @@ void em_cmd_t::copy_bus_event(em_bus_event_t *evt)
 
 void em_cmd_t::copy_frame_event(em_frame_event_t *evt)
 {
+        if (!evt) { throw std::invalid_argument("evt is null"); }
 	em_frame_event_t *fevt;
 
 	m_evt->type = em_event_type_frame;
@@ -113,6 +117,7 @@ void em_cmd_t::copy_frame_event(em_frame_event_t *evt)
 
 char *em_cmd_t::status_to_string(em_cmd_out_status_t status, char *str)
 {
+    if (!str) { return NULL; }
     cJSON *obj, *res = NULL;
     em_long_string_t status_str;
     em_subdoc_info_t *info;
@@ -247,6 +252,8 @@ em_cmd_t *em_cmd_t::clone_for_next()
 
 void em_cmd_t::override_op(unsigned int index, em_orch_desc_t *desc)
 {
+    if (!desc) { throw std::invalid_argument("desc is null"); }
+    if (index >= EM_MAX_CMD) { throw std::out_of_range("index out of range"); }
     em_cmd_ctx_t *ctx;
 
     m_orch_desc[index].op = desc->op;
@@ -861,6 +868,10 @@ int em_cmd_t::dump_bus_event(em_bus_event_t *evt)
         printf("%s:%d: NULL event\n", __func__, __LINE__);
         return -1;
     }
+    if (evt->type >= em_bus_event_type_max) {
+        printf("%s:%d: Invalid event type\n", __func__, __LINE__);
+        return -1;
+    }
 
     printf("Bus Event\n");
 
@@ -892,8 +903,8 @@ em_cmd_t::em_cmd_t(em_cmd_type_t type, em_cmd_params_t param, dm_easy_mesh_t& dm
     : m_type(em_cmd_type_none), m_svc(em_service_type_none), m_param{}, m_evt(NULL), m_em_candidates(nullptr), m_db_cfg_type(db_cfg_type_none)
 {
     auto raw = static_cast<std::underlying_type_t<em_cmd_type_t>>(type);
-    m_type = (raw >= static_cast<decltype(raw)>(em_cmd_type_max))
-             ? em_cmd_type_max : type;
+    if (raw >= static_cast<decltype(raw)>(em_cmd_type_max)) { throw std::invalid_argument("invalid cmd type"); }
+    m_type = type;
     m_db_cfg_type = db_cfg_type_none;
     memcpy(&m_param, &param, sizeof(em_cmd_params_t));
     init(dm);
@@ -904,8 +915,8 @@ em_cmd_t::em_cmd_t(em_cmd_type_t type, em_cmd_params_t param)
     : m_type(em_cmd_type_none), m_svc(em_service_type_none), m_param{}, m_evt(NULL), m_em_candidates(nullptr), m_db_cfg_type(db_cfg_type_none)
 {
     auto raw = static_cast<std::underlying_type_t<em_cmd_type_t>>(type);
-    m_type = (raw >= static_cast<decltype(raw)>(em_cmd_type_max))
-             ? em_cmd_type_max : type;
+    if (raw >= static_cast<decltype(raw)>(em_cmd_type_max)) { throw std::invalid_argument("invalid cmd type"); }
+    m_type = type;
     m_db_cfg_type = db_cfg_type_none;
     memcpy(&m_param, &param, sizeof(em_cmd_params_t));
     init();

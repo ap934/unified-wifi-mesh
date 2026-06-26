@@ -3308,6 +3308,9 @@ void dm_easy_mesh_t::update_scan_results(em_scan_result_t *scan_result)
 
 em_ap_mld_info_t *dm_easy_mesh_t::get_ap_mld_frm_bssid(mac_address_t bss_id)
 {
+    if (!bss_id) {
+        return NULL;
+    }
     unsigned int i, j;
     em_ap_mld_info_t *ap_mld_info = NULL;
 

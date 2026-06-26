@@ -36,6 +36,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include "dm_neighbor.h"
+#include <stdexcept>
 #include "dm_easy_mesh.h"
 #include "dm_easy_mesh_ctrl.h"
 
@@ -82,6 +83,7 @@ int dm_neighbor_t::decode(const cJSON *obj, void *parent_id)
 
 void dm_neighbor_t::encode(cJSON *obj, bool summary)
 {
+    if (!obj) { throw std::invalid_argument("obj is null"); }
     mac_addr_str_t  mac_str;
 
 	dm_easy_mesh_t::macbytes_to_string(m_neighbor_info.nbr, mac_str);

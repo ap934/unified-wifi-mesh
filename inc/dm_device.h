@@ -21,6 +21,7 @@
 
 #include "em_base.h"
 #include <cstring>
+#include <stdexcept>
 
 class dm_device_t {
 public:
@@ -121,7 +122,7 @@ public:
 	 *
 	 * @note Ensure that the MAC address provided is valid and correctly formatted.
 	 */
-	void set_dev_interface_mac(unsigned char *mac) { memcpy(m_device_info.intf.mac, mac, sizeof(mac_address_t)); }
+	void set_dev_interface_mac(unsigned char *mac) { if (!mac) throw std::invalid_argument("mac is null"); memcpy(m_device_info.intf.mac, mac, sizeof(mac_address_t)); }
     
 	/**!
 	 * @brief Sets the device interface name.
@@ -132,7 +133,7 @@ public:
 	 *
 	 * @note Ensure that the name is null-terminated and does not exceed the buffer size.
 	 */
-	void set_dev_interface_name(char *name) { strncpy(m_device_info.intf.name, name, strlen(name) + 1); }
+	void set_dev_interface_name(char *name) { if (!name) throw std::invalid_argument("name is null"); strncpy(m_device_info.intf.name, name, strlen(name) + 1); }
 	
     
 	/**!
@@ -230,7 +231,7 @@ public:
 	 *
 	 * @note The input string should be null-terminated and should not exceed the buffer size of the manufacturer field.
 	 */
-	void set_manufacturer(char *manufacturer) { snprintf(m_device_info.manufacturer, sizeof(m_device_info.manufacturer), "%s", manufacturer); }
+void set_manufacturer(char *manufacturer) { if (!manufacturer) throw std::invalid_argument("manufacturer is null"); snprintf(m_device_info.manufacturer, sizeof(m_device_info.manufacturer), "%s", manufacturer); }
     
 	/**!
 	 * @brief Sets the manufacturer model for the device.
@@ -241,7 +242,7 @@ public:
 	 *
 	 * @note Ensure that the model string is null-terminated and does not exceed the buffer size.
 	 */
-	void set_manufacturer_model(char *model) { snprintf(m_device_info.manufacturer_model, sizeof(m_device_info.manufacturer_model), "%s", model); }
+	void set_manufacturer_model(char *model) { if (!model) throw std::invalid_argument("model is null"); if (strlen(model) >= sizeof(m_device_info.manufacturer_model)) throw std::invalid_argument("model exceeds buffer"); snprintf(m_device_info.manufacturer_model, sizeof(m_device_info.manufacturer_model), "%s", model); }
     
 	/**!
 	 * @brief Sets the software version for the device.
@@ -252,7 +253,7 @@ public:
 	 *
 	 * @note The version string should be null-terminated and should not exceed the buffer size of the software version field.
 	 */
-	void set_software_version(char *version) { snprintf(m_device_info.software_ver, sizeof(m_device_info.software_ver), "%s", version); }
+	void set_software_version(char *version) { if (!version) throw std::invalid_argument("version is null"); snprintf(m_device_info.software_ver, sizeof(m_device_info.software_ver), "%s", version); }
     
 	/**!
 	 * @brief Sets the serial number for the device.
@@ -265,7 +266,7 @@ public:
 	 * @note Ensure that the serial number provided is null-terminated and does not
 	 * exceed the maximum size of the device's serial number field.
 	 */
-	void set_serial_number(char *serial) { snprintf(m_device_info.serial_number, sizeof(m_device_info.serial_number), "%s", serial); }
+void set_serial_number(char *serial) { if (!serial) throw std::invalid_argument("serial is null"); snprintf(m_device_info.serial_number, sizeof(m_device_info.serial_number), "%s", serial); }
     
 	/**!
 	 * @brief Sets the primary device type.
@@ -278,7 +279,7 @@ public:
 	 * @note The input string should be null-terminated and should not exceed the
 	 *       size of the primary_device_type field.
 	 */
-	void set_primary_device_type(char *type) { snprintf(m_device_info.primary_device_type, sizeof(m_device_info.primary_device_type), "%s", type); }
+	void set_primary_device_type(char *type) { if (!type) throw std::invalid_argument("type is null"); if (strlen(type) >= sizeof(m_device_info.primary_device_type)) throw std::invalid_argument("type exceeds buffer"); snprintf(m_device_info.primary_device_type, sizeof(m_device_info.primary_device_type), "%s", type); }
     bool operator == (const dm_device_t& obj);
     void operator = (const dm_device_t& obj);
     //void operator = (const dm_device_t& obj) { memcpy(&m_device_info, &obj.m_device_info, sizeof(em_device_info_t)); }

@@ -40,6 +40,7 @@
 #include <openssl/bio.h> /* BasicInput/Output streams */
 #include <openssl/err.h> /* errors */
 #include <openssl/ssl.h> /* core library */
+#include <stdexcept>
 #include "em.h"
 #include "em_mgr.h"
 #include "em_msg.h"
@@ -98,6 +99,8 @@ void em_mgr_t::io_process(em_bus_event_type_t type, unsigned char *data, unsigne
 
 bool em_mgr_t::io_process(em_event_t *evt)
 {
+    if (!evt) { return false; }
+    if (evt->type >= em_event_type_max) { return false; }
     em_event_t *e;
     em_bus_event_t *bevt;
     bool should_wait;
@@ -163,6 +166,7 @@ void em_mgr_t::delete_nodes()
 
 void em_mgr_t::delete_node(em_interface_t *ruid)
 {
+    if (!ruid) { throw std::invalid_argument("ruid is null"); }
     em_t *em = NULL;
     mac_addr_str_t	mac_str;
 
@@ -582,6 +586,8 @@ int em_mgr_t::start()
 
 void em_mgr_t::push_to_queue(em_event_t *evt)
 {
+    if (!evt) { throw std::invalid_argument("evt is null"); }
+    if (evt->type >= em_event_type_max) { throw std::invalid_argument("invalid event type"); }
     pthread_mutex_lock(&m_queue.lock);
     queue_push(m_queue.queue, evt);
     pthread_cond_signal(&m_queue.cond);

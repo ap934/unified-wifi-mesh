@@ -3431,6 +3431,7 @@ typedef enum {
     em_policy_id_type_client_filters,
 
 	em_policy_id_type_unknown,
+	em_policy_id_type_max,
 } em_policy_id_type_t;
 
 typedef struct {

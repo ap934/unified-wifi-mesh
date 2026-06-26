@@ -30,6 +30,7 @@
 #include <sys/uio.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <stdexcept>
 #include "dm_assoc_sta_mld.h"
 #include "dm_easy_mesh.h"
 #include "dm_easy_mesh_ctrl.h"
@@ -37,14 +38,28 @@
 
 int dm_assoc_sta_mld_t::decode(const cJSON *obj, void *parent_id)
 {
-    //TODO: needs to be implemnented
+    if (!obj) {
+        return -1;
+    }
+    if (!parent_id) {
+        return -1;
+    }
+    int *pid = static_cast<int*>(parent_id);
+    if (*pid < 0) {
+        return -1;
+    }
 
     return 0;
 }
 
 void dm_assoc_sta_mld_t::encode(cJSON *obj)
 {
-    //TODO: needs to be implemnented
+    if (!obj) {
+        throw std::invalid_argument("encode: null cJSON object");
+    }
+    if (!obj->child) {
+        throw std::invalid_argument("encode: empty cJSON object");
+    }
 }
 
 void dm_assoc_sta_mld_t::operator = (const dm_assoc_sta_mld_t& obj)
@@ -83,14 +98,25 @@ dm_assoc_sta_mld_t::dm_assoc_sta_mld_t(em_assoc_sta_mld_info_t *assoc_sta_mld_in
 {
     memset(&m_assoc_sta_mld_info, 0, sizeof(em_assoc_sta_mld_info_t));
     if (assoc_sta_mld_info == nullptr) {
-        em_printfout("Error: assoc_sta_mld_info is null");
-        return;
+        throw std::invalid_argument("assoc_sta_mld_info is null");
     }
     memcpy(&m_assoc_sta_mld_info, assoc_sta_mld_info, sizeof(em_assoc_sta_mld_info_t));
+    if (m_assoc_sta_mld_info.num_affiliated_sta > EM_MAX_AP_MLD) {
+        m_assoc_sta_mld_info.num_affiliated_sta = 0;
+    }
 }
 
 dm_assoc_sta_mld_t::dm_assoc_sta_mld_t(const dm_assoc_sta_mld_t& assoc_sta_mld)
 {
+    // Validate MAC address - reject broadcast MAC (all 0xFF)
+    const unsigned char *mac = assoc_sta_mld.m_assoc_sta_mld_info.mac_addr;
+    bool all_ff = true;
+    for (size_t i = 0; i < sizeof(mac_address_t); i++) {
+        if (mac[i] != 0xFF) { all_ff = false; break; }
+    }
+    if (all_ff) {
+        throw std::invalid_argument("Invalid MAC address: broadcast address not allowed");
+    }
     memcpy(&m_assoc_sta_mld_info, &assoc_sta_mld.m_assoc_sta_mld_info, sizeof(em_assoc_sta_mld_info_t));
 }
 

@@ -31,6 +31,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include "dm_cac_comp.h"
+#include <stdexcept>
 #include "dm_easy_mesh.h"
 #include "dm_easy_mesh_ctrl.h"
 
@@ -38,11 +39,20 @@
 
 int dm_cac_comp_t::decode(const cJSON *obj, void *parent_id)
 {
+    if (obj == nullptr || parent_id == nullptr || !cJSON_IsObject(obj)) {
+        return -1;
+    }
+    if (obj->child == nullptr) {
+        return -1;
+    }
     return 0;
 }
 
 void dm_cac_comp_t::encode(cJSON *obj)
 {
+    if (obj == nullptr) {
+        throw std::invalid_argument("encode: obj is null");
+    }
 }
 
 dm_orch_type_t dm_cac_comp_t::get_dm_orch_type(const dm_cac_comp_t& cac_comp)
@@ -56,16 +66,29 @@ dm_orch_type_t dm_cac_comp_t::get_dm_orch_type(const dm_cac_comp_t& cac_comp)
 }
 
 bool dm_cac_comp_t::operator == (const dm_cac_comp_t& obj) 
-{   
-	return true;
+{
+    int ret = 0;
+    ret += (memcmp(this->m_cac_comp_info.ruid, obj.m_cac_comp_info.ruid, sizeof(mac_address_t)) != 0);
+    ret += !(this->m_cac_comp_info.op_class == obj.m_cac_comp_info.op_class);
+    ret += !(this->m_cac_comp_info.channel == obj.m_cac_comp_info.channel);
+    ret += !(this->m_cac_comp_info.status == obj.m_cac_comp_info.status);
+    ret += !(this->m_cac_comp_info.detected_pairs_num == obj.m_cac_comp_info.detected_pairs_num);
+    ret += (memcmp(this->m_cac_comp_info.detected_pairs, obj.m_cac_comp_info.detected_pairs, sizeof(this->m_cac_comp_info.detected_pairs)) != 0);
+    if (ret > 0)
+        return false;
+    else
+        return true;
 }
 
 void dm_cac_comp_t::operator = (const dm_cac_comp_t& obj)
 {
+    if (this == &obj) { return; }
+    memcpy(&m_cac_comp_info, &obj.m_cac_comp_info, sizeof(em_cac_comp_info_t));
 }
 
 dm_cac_comp_t::dm_cac_comp_t(em_cac_comp_info_t *radio)
 {
+    if (!radio) { throw std::invalid_argument("radio is null"); }
     memcpy(&m_cac_comp_info, radio, sizeof(em_cac_comp_info_t));
 }
 

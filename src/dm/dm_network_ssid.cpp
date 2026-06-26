@@ -31,10 +31,17 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include "dm_network_ssid.h"
+#include <stdexcept>
 #include "dm_easy_mesh.h"
 
 int dm_network_ssid_t::decode(const cJSON *obj, void *parent_id)
 {
+    if (obj == nullptr || parent_id == nullptr) {
+        return -1;
+    }
+    if (!cJSON_IsObject(obj) || obj->child == nullptr) {
+        return -1;
+    }
     cJSON *tmp, *tmp_arr;
     mac_addr_str_t  mac_str;
     int j;
@@ -111,6 +118,7 @@ int dm_network_ssid_t::decode(const cJSON *obj, void *parent_id)
 
 void dm_network_ssid_t::encode(cJSON *obj)
 {
+    if (!obj) { throw std::invalid_argument("obj is null"); }
   
     unsigned int i;
     mac_addr_str_t  mac_str;
@@ -273,6 +281,7 @@ em_haul_type_t dm_network_ssid_t::haul_type_from_string(em_string_t str)
 
 dm_network_ssid_t::dm_network_ssid_t(em_network_ssid_info_t *net_ssid)
 {
+    if (!net_ssid) { throw std::invalid_argument("net_ssid is null"); }
     memcpy(&m_network_ssid_info, net_ssid, sizeof(em_network_ssid_info_t));
 }
 
