@@ -36,6 +36,7 @@
 
 int dm_op_class_t::decode(const cJSON *obj, void *parent_id)
 {
+    if (obj == NULL || parent_id == NULL) { return -1; }
     cJSON *tmp, *non_op_array;
     unsigned int i;
 
@@ -89,6 +90,7 @@ int dm_op_class_t::decode(const cJSON *obj, void *parent_id)
 
 void dm_op_class_t::encode(cJSON *obj)
 {
+    if (obj == NULL) { return; }
     unsigned int i;
 
     cJSON_AddNumberToObject(obj, "Channel", m_op_class_info.channel);
@@ -183,6 +185,7 @@ void dm_op_class_t::operator = (const dm_op_class_t& obj)
 
 int dm_op_class_t::parse_op_class_id_from_key(const char *key, em_op_class_id_t *id)
 {
+    if (key == NULL || id == NULL) { return -1; }
     em_long_string_t   str;
     char *tmp, *remain;
     unsigned int i = 0;

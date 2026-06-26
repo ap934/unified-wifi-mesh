@@ -149,6 +149,7 @@ bool em_orch_t::submit_command(em_cmd_t *pcmd)
 
 void em_orch_t::destroy_command(em_cmd_t *pcmd)
 {
+    if (pcmd == NULL) { return; }
     unsigned int count;
 	em_t *em;
 
@@ -337,6 +338,7 @@ bool em_orch_t::orchestrate(em_cmd_t *pcmd, em_t *em)
 
 bool em_orch_t::eligible_for_active(em_cmd_t *pcmd)
 {
+    if (pcmd == NULL) { return false; }
     signed int i;
     bool eligible = true;
     em_t *em;

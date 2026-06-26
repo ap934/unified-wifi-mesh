@@ -37,6 +37,7 @@
 
 int dm_bss_t::decode(const cJSON *obj, void *parent_id)
 {
+    if (obj == NULL || parent_id == NULL) { return -1; }
     cJSON *tmp, *tmp_arr;
     mac_addr_str_t  mac_str;
     int i;
@@ -186,6 +187,7 @@ int dm_bss_t::decode(const cJSON *obj, void *parent_id)
 
 void dm_bss_t::encode(cJSON *obj, bool summary)
 {
+    if (obj == NULL) { return; }
     mac_addr_str_t  mac_str;
     unsigned short i;
 	em_short_string_t	haul_type_str;
@@ -374,6 +376,7 @@ bool dm_bss_t::operator == (const dm_bss_t& obj)
 
 bool dm_bss_t::match_criteria(char *criteria)
 {
+    if (criteria == NULL) { return false; }
 	char *tmp;
 	mac_address_t radio_mac;
 
@@ -393,6 +396,7 @@ bool dm_bss_t::match_criteria(char *criteria)
 
 int dm_bss_t::parse_bss_id_from_key(const char *key, em_bss_id_t *id)
 {
+    if (key == NULL || id == NULL) { return -1; }
     em_long_string_t   str;
     char *tmp, *remain;
     unsigned int i = 0;

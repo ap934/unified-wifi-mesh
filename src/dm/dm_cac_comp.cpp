@@ -38,11 +38,13 @@
 
 int dm_cac_comp_t::decode(const cJSON *obj, void *parent_id)
 {
+    if (obj == NULL || parent_id == NULL) { return -1; }
     return 0;
 }
 
 void dm_cac_comp_t::encode(cJSON *obj)
 {
+    if (obj == NULL) { return; }
 }
 
 dm_orch_type_t dm_cac_comp_t::get_dm_orch_type(const dm_cac_comp_t& cac_comp)

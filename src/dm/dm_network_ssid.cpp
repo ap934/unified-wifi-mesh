@@ -35,6 +35,7 @@
 
 int dm_network_ssid_t::decode(const cJSON *obj, void *parent_id)
 {
+    if (obj == NULL || parent_id == NULL) { return -1; }
     cJSON *tmp, *tmp_arr;
     mac_addr_str_t  mac_str;
     int j;
@@ -111,6 +112,7 @@ int dm_network_ssid_t::decode(const cJSON *obj, void *parent_id)
 
 void dm_network_ssid_t::encode(cJSON *obj)
 {
+    if (obj == NULL) { return; }
   
     unsigned int i;
     mac_addr_str_t  mac_str;

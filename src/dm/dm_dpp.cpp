@@ -58,6 +58,7 @@ int dm_dpp_t::analyze_config(const cJSON *obj, void *parent, em_cmd_t *pcmd[], e
 
 int dm_dpp_t::decode(const cJSON *obj, void *parent_id, void* user_info)
 {
+    if (obj == NULL || parent_id == NULL) { return -1; }
     printf("%s:%d: Decoding DPP\n", __func__, __LINE__);
 
     std::string country_code = "US";
@@ -87,6 +88,7 @@ int dm_dpp_t::decode(const cJSON *obj, void *parent_id, void* user_info)
 
 void dm_dpp_t::encode(cJSON *obj)
 {
+    if (obj == NULL) { return; }
     cJSON_AddNumberToObject(obj, "V:", m_dpp_info.version);
 }
 

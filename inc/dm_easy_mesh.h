@@ -19,6 +19,7 @@
 #ifndef DM_EM_H
 #define DM_EM_H
 #include <vector>
+#include <stdexcept>
 #include <atomic>
 #include "em_base.h"
 #include "wifi_webconfig.h"
@@ -91,11 +92,6 @@ public:
     unsigned int    m_num_assoc_sta_mld;
     dm_assoc_sta_mld_t m_assoc_sta_mld[EM_MAX_ASSOC_STA_MLD];
     dm_tid_to_link_t m_tid_to_link;
-    em_unassoc_sta_metrics_rsp_t    m_unassoc_sta_metrics_rsp;
-    em_unassoc_query_list_t m_unassoc_query_list;
-
-    unsigned int m_num_unassoc_sta_metrics;
-    em_unassoc_sta_metric_entry_t  m_unassoc_sta_metrics[EM_MAX_UNASSOC_STA];
 
 public:
 
@@ -107,77 +103,9 @@ public:
 	unsigned int get_ssid_mismatch_check_time() const { return ssid_mismatch_check_time; }
 	void set_last_topo_query_sent_time(unsigned int time) { last_topo_query_sent_time = time; }
 	unsigned int get_last_topo_query_sent_time() const { return last_topo_query_sent_time; }
-        static em_e4_table_t m_e4_table[];
-        static const size_t m_e4_table_size;
 
-       /**!
-        * @brief Retrieves the beacon channel based on center channel and bandwidth.
-        *
-        * This function calculates the beacon channel corresponding to a given
-        * center channel and operating bandwidth.
-        *
-        * @param[in] center_channel  The center channel from which the beacon channel is derived.
-        * @param[in] bandwidth       The channel bandwidth (e.g., 20, 40, 80, 160, 320 MHz).
-        *
-        * @return The calculated beacon channel associated with the provided center
-        *         channel and bandwidth.
-        *
-        * @note Ensure that the center_channel is valid.
-        */
-        static int get_beaconchannel_by_bandwidth(int center_channel, int bandwidth);
- 
-       /**!
-        * @brief Retrieves the center channel from a given beacon channel and bandwidth.
-        *
-        * This function determines the center channel corresponding to a beacon (primary)
-        * channel and the operating bandwidth.
-        *
-        * @param[in] beacon_channel  The primary/beacon channel.
-        * @param[in] bandwidth       The operating channel bandwidth (20/40/80/160/320 MHz).
-        *
-        * @return The calculated center channel for the provided beacon channel and
-        *         bandwidth.
-        *
-        * @note The function assumes a valid beacon channel for the given bandwidth.
-        */
-        static int get_centerchannel_by_bandwidth(int beacon_channel, int bandwidth);
-
-       /**!
-        * @brief Retrieves the beacon channel based on operating class and channel
-        *        as per the m_e4_table.
-	*
-        * This function maps an operating class and channel number to the appropriate
-        * beacon (primary) channel as per the m_e4_table. Operating classes define
-        * regulatory behavior such as bandwidth, channel spacing, and allowed channels.
-        *
-        * @param[in] op_class The operating class that defines channel behavior.
-        * @param[in] channel  The channel for which the beacon channel is required.
-        *
-        * @return The corresponding beacon channel for the given operating class
-        *         and channel.
-        *
-        * @note Ensure that the operating class is valid and corresponds to the region’s
-        *       regulatory domain to avoid incorrect mapping results.
-        */
-        static int get_beaconchannel_by_opclass(int op_class, int channel);
-
-       /**!
-        * @brief Retrieves the center channel for a given operating class and channel
-        *        as per the m_e4_table.
-	*
-        * This function computes the center channel associated with a specific operating
-        * class and channel number as per the m_e4_table.
-        *
-        * @param[in] op_class The operating class.
-        * @param[in] channel  The channel from which the center channel needs to be derived.
-        *
-        * @return The center channel corresponding to the provided operating class and channel.
-        *
-        * @note This mapping is dependent on regulatory domain definitions. Ensure the
-        *       operating class and channel values are valid and supported.
-        */
-        static int get_centerchannel_by_opclass(int op_class, int channel);
-
+	static em_e4_table_t m_e4_table[];
+	
 	/**!
 	 * @brief Retrieves the frequency band associated with a given operating class.
 	 *
@@ -253,7 +181,7 @@ public:
 	 *
 	 * @note Ensure that the `dm` pointer is valid and properly initialized before calling this function.
 	 */
-	static em_bss_info_t *get_bss_info_with_mac(void *dm, mac_address_t mac) { return (static_cast<dm_easy_mesh_t *>(dm))->get_bss_info_with_mac(mac); }
+	static em_bss_info_t *get_bss_info_with_mac(void *dm, mac_address_t mac) { if (!dm) return nullptr; return (static_cast<dm_easy_mesh_t *>(dm))->get_bss_info_with_mac(mac); }
     
 	/**!
 	 * @brief Analyzes device initialization.
@@ -808,7 +736,7 @@ public:
 	 *
 	 * @note Ensure that the MAC address is valid and properly formatted before calling this function.
 	 */
-	void set_ctrl_al_interface_mac(unsigned char *mac) { m_network.set_controller_id(mac); }
+	void set_ctrl_al_interface_mac(unsigned char *mac) { if (!mac) throw std::invalid_argument("null mac"); m_network.set_controller_id(mac); }
     
 	/**!
 	 * @brief Sets the control AL interface name.
@@ -819,7 +747,7 @@ public:
 	 *
 	 * @note This function modifies the interface name used by the network control agent.
 	 */
-	void set_ctrl_al_interface_name(char *name) { snprintf(m_network.m_net_info.ctrl_id.name, sizeof(m_network.m_net_info.ctrl_id.name), "%s", name); }
+	void set_ctrl_al_interface_name(char *name) { if (!name) return; m_network.set_controller_id(reinterpret_cast<unsigned char*>(name)); }
 	
 	/**!
 	 * @brief Sets the controller ID for the network.
@@ -830,7 +758,7 @@ public:
 	 *
 	 * @note Ensure that the MAC address is valid and correctly formatted before calling this function.
 	 */
-	void set_controller_id(unsigned char *mac) { m_network.set_controller_id(mac); }
+	void set_controller_id(unsigned char *mac) { if (!mac) throw std::invalid_argument("null mac"); m_network.set_controller_id(mac); }
 	
 	/**!
 	 * @brief Sets the controller interface media type.
@@ -885,7 +813,7 @@ public:
 	 *
 	 * @note Ensure that the MAC address is valid and properly formatted before calling this function.
 	 */
-	void set_agent_al_interface_mac(unsigned char *mac) { m_device.set_dev_interface_mac(mac); }
+	void set_agent_al_interface_mac(unsigned char *mac) { if (!mac) return; m_device.set_dev_interface_mac(mac); }
     
 	/**!
 	 * @brief Sets the interface name for the agent.
@@ -896,7 +824,7 @@ public:
 	 *
 	 * @note The name should be a valid network interface identifier.
 	 */
-	void set_agent_al_interface_name(char *name) { return m_device.set_dev_interface_name(name); }
+	void set_agent_al_interface_name(char *name) { if (!name) return; return m_device.set_dev_interface_name(name); }
 
     
 	/**!
@@ -996,7 +924,7 @@ public:
 	 *
 	 * @note Ensure that the `dm` pointer is valid and correctly castable to `dm_easy_mesh_t`.
 	 */
-	static em_device_info_t *get_device_info(void *dm) { return (static_cast<dm_easy_mesh_t *>(dm))->get_device_info(); }
+	static em_device_info_t *get_device_info(void *dm) { if (!dm) return nullptr; return (static_cast<dm_easy_mesh_t *>(dm))->get_device_info(); }
     
     
 	/**!
@@ -1046,7 +974,7 @@ public:
 	 *
 	 * @note Ensure that the provided pointer is valid and correctly initialized.
 	 */
-	static em_network_info_t *get_network_info(void *dm) { return (static_cast<dm_easy_mesh_t *>(dm))->get_network_info(); }
+	static em_network_info_t *get_network_info(void *dm) { if (!dm) return nullptr; return (static_cast<dm_easy_mesh_t *>(dm))->get_network_info(); }
     
 	/**!
 	 * @brief Retrieves the MAC address of the controller interface.
@@ -1073,7 +1001,7 @@ public:
 	 *
 	 * @note Ensure that the index is within the valid range of interfaces.
 	 */
-	em_interface_t *get_interface_by_index(unsigned int index) { return &m_interfaces[index]; }
+	em_interface_t *get_interface_by_index(unsigned int index) { if (index >= m_num_interfaces) return nullptr; return &m_interfaces[index]; }
 	
 	/**!
 	 * @brief Retrieves the prioritized interface for a given platform.
@@ -1178,7 +1106,7 @@ public:
 	 *
 	 * @note Ensure that the index is within the valid range of the array.
 	 */
-	dm_network_ssid_t *get_network_ssid(unsigned int index) { return &m_network_ssid[index]; }
+	dm_network_ssid_t *get_network_ssid(unsigned int index) { if (index >= m_num_net_ssids) return nullptr; return &m_network_ssid[index]; }
     
 	/**!
 	 * @brief Retrieves the network SSID by reference for a given index.
@@ -1233,7 +1161,7 @@ public:
 	 * @note Ensure that the index is within the valid range of operational
 	 * classes to avoid undefined behavior.
 	 */
-	em_op_class_info_t *get_op_class_info(unsigned int index) { return m_op_class[index].get_op_class_info(); }
+	em_op_class_info_t *get_op_class_info(unsigned int index) { if (index >= m_num_opclass) return nullptr; return m_op_class[index].get_op_class_info(); }
     
 	/**!
 	 * @brief Retrieves the operational class information for a given index.
@@ -1249,7 +1177,7 @@ public:
 	 *
 	 * @note Ensure that the data model (dm) is properly initialized before calling this function.
 	 */
-	static em_op_class_info_t *get_op_class_info(void *dm, unsigned int index) { return (static_cast<dm_easy_mesh_t *>(dm))->get_op_class_info(index); }
+	static em_op_class_info_t *get_op_class_info(void *dm, unsigned int index) { if (!dm) return nullptr; return (static_cast<dm_easy_mesh_t *>(dm))->get_op_class_info(index); }
     
 	/**!
 	 * @brief Retrieves the number of operational classes.
@@ -1268,7 +1196,7 @@ public:
 	 *
 	 * @returns The number of operational classes as an unsigned integer.
 	 */
-	static unsigned int get_num_op_class(void *dm) { return (static_cast<dm_easy_mesh_t *>(dm))->get_num_op_class(); }
+	static unsigned int get_num_op_class(void *dm) { if (!dm) return 0; return (static_cast<dm_easy_mesh_t *>(dm))->get_num_op_class(); }
     
 	/**!
 	 * @brief Sets the number of operating classes.
@@ -1291,7 +1219,7 @@ public:
 	 *
 	 * @note Ensure that the dm pointer is valid before calling this function.
 	 */
-	static void set_num_op_class(void *dm, unsigned int num) { (static_cast<dm_easy_mesh_t *>(dm))->set_num_op_class(num); }
+	static void set_num_op_class(void *dm, unsigned int num) { if (!dm) throw std::invalid_argument("null dm"); (static_cast<dm_easy_mesh_t *>(dm))->set_num_op_class(num); }
     
 	/**!
 	 * @brief Retrieves the operational class at the specified index.
@@ -1355,7 +1283,7 @@ public:
 	 *
 	 * @note Ensure that the index is within the valid range of BSS entries.
 	 */
-	static em_bss_info_t *get_bss_info(void *dm, unsigned int index) { if (dm == nullptr) return NULL; return (static_cast<dm_easy_mesh_t *>(dm))->get_bss_info(index); }
+	static em_bss_info_t *get_bss_info(void *dm, unsigned int index) { return (static_cast<dm_easy_mesh_t *>(dm))->get_bss_info(index); }
 
 	/**!
 	 * @brief Retrieves the `em_bss_info_t` for the bSTA.
@@ -1390,7 +1318,7 @@ public:
 	 *
 	 * @returns The number of BSS.
 	 */
-	static unsigned int get_num_bss(void *dm) { return (static_cast<dm_easy_mesh_t *>(dm))->get_num_bss(); }
+	static unsigned int get_num_bss(void *dm) { if (!dm) return 0; return (static_cast<dm_easy_mesh_t *>(dm))->get_num_bss(); }
     
 	/**!
 	 * @brief Sets the number of BSS (Basic Service Set).
@@ -1411,7 +1339,7 @@ public:
 	 *
 	 * @note Ensure that the mesh instance is properly initialized before calling this function.
 	 */
-	static void set_num_bss(void *dm, unsigned int num) { (static_cast<dm_easy_mesh_t *>(dm))->set_num_bss(num); }
+	static void set_num_bss(void *dm, unsigned int num) { if (!dm) throw std::invalid_argument("null dm"); (static_cast<dm_easy_mesh_t *>(dm))->set_num_bss(num); }
     
 	/**!
 	 * @brief Retrieves a BSS (Basic Service Set) from the list based on the provided index.
@@ -1508,7 +1436,7 @@ public:
 	 *
 	 * @note Ensure that the index is within the valid range of the policy array.
 	 */
-	dm_policy_t *get_policy(unsigned int index) { return &m_policy[index]; }
+	dm_policy_t *get_policy(unsigned int index) { if (index >= m_num_policy) return nullptr; return &m_policy[index]; }
     
 	/**!
 	 * @brief Retrieves a reference to the policy at the specified index.
@@ -1525,19 +1453,7 @@ public:
 	 */
 	dm_policy_t& get_policy_by_ref(unsigned int index) { return m_policy[index]; }
 
-	/**!
-	 * @brief Checks whether this data model contains a policy of the given type.
-	 *
-	 * @param[in] type The policy ID type to search for.
-	 * @returns true if at least one policy with the given type exists, false otherwise.
-	 */
-	bool has_policy_type(em_policy_id_type_t type) const {
-		for (unsigned int i = 0; i < m_num_policy; i++) {
-			if (m_policy[i].m_policy.id.type == type) return true;
-		}
-		return false;
-	}
-
+	
 	/**!
 	 * @brief Finds a matching scan result based on the provided scan result ID.
 	 *
@@ -1611,7 +1527,7 @@ public:
 	 *
 	 * @note This function is static and should be used internally within the EasyMesh module.
 	 */
-	static void update_scan_results(void *dm, em_scan_result_t *scan_result) { (static_cast<dm_easy_mesh_t *> (dm))->update_scan_results(scan_result); }
+	static void update_scan_results(void *dm, em_scan_result_t *scan_result) { if (!dm || !scan_result) throw std::invalid_argument("null argument"); (static_cast<dm_easy_mesh_t *> (dm))->update_scan_results(scan_result); }
 
     
 	/**!
@@ -1631,7 +1547,7 @@ public:
 	 *
 	 * @returns The number of AP MLDs.
 	 */
-	static unsigned int get_num_ap_mld(void *dm) { return (static_cast<dm_easy_mesh_t *>(dm))->get_num_ap_mld(); }
+	static unsigned int get_num_ap_mld(void *dm) { if (!dm) return 0; return (static_cast<dm_easy_mesh_t *>(dm))->get_num_ap_mld(); }
     
 	/**!
 	 * @brief Sets the number of AP MLD.
@@ -1652,7 +1568,7 @@ public:
 	 *
 	 * @note Ensure that the `dm` pointer is valid and points to a properly initialized EasyMesh configuration object.
 	 */
-	static void set_num_ap_mld(void *dm, unsigned int num) { (static_cast<dm_easy_mesh_t *>(dm))->set_num_ap_mld(num); }
+	static void set_num_ap_mld(void *dm, unsigned int num) { if (!dm) throw std::invalid_argument("null dm"); (static_cast<dm_easy_mesh_t *>(dm))->set_num_ap_mld(num); }
     
 	/**!
 	 * @brief Retrieves the access point MLD (Multi-Link Device) at the specified index.
@@ -1665,7 +1581,7 @@ public:
 	 *
 	 * @note Ensure that the index is within the valid range to avoid undefined behavior.
 	 */
-	dm_ap_mld_t *get_ap_mld(unsigned int index) { return &m_ap_mld[index]; }
+	dm_ap_mld_t *get_ap_mld(unsigned int index) { if (index >= m_num_ap_mld) return nullptr; return &m_ap_mld[index]; }
     
 	/**!
 	 * @brief Retrieves a reference to the AP MLD at the specified index.
@@ -1700,7 +1616,7 @@ public:
 	 *
 	 * @returns True if BSTA MLD is present, false otherwise.
 	 */
-	static bool is_bsta_mld_present(void *dm) { return (static_cast<dm_easy_mesh_t *>(dm))->is_bsta_mld_present(); }
+	static bool is_bsta_mld_present(void *dm) { if (!dm) return false; return (static_cast<dm_easy_mesh_t *>(dm))->is_bsta_mld_present(); }
 
 	/**!
 	 * @brief Retrieves the BSTA MLD information.
@@ -1741,13 +1657,13 @@ public:
 	 *
 	 * @returns The number of associated stations in the mesh network.
 	 */
-	static unsigned int get_num_assoc_sta_mld(void *dm) { return (static_cast<dm_easy_mesh_t *>(dm))->get_num_assoc_sta_mld(); }
+	static unsigned int get_num_assoc_sta_mld(void *dm) { if (!dm) return 0; return (static_cast<dm_easy_mesh_t *>(dm))->get_num_assoc_sta_mld(); }
 
 	em_ap_mld_info_t *get_ap_mld_frm_bssid(mac_address_t bss_id);
-	static em_ap_mld_info_t *get_ap_mld_frm_bssid(void *dm, mac_address_t bss_id) { return (static_cast<dm_easy_mesh_t *>(dm))->get_ap_mld_frm_bssid(bss_id); }
+	static em_ap_mld_info_t *get_ap_mld_frm_bssid(void *dm, mac_address_t bss_id) { if (!dm || !bss_id) return nullptr; return (static_cast<dm_easy_mesh_t *>(dm))->get_ap_mld_frm_bssid(bss_id); }
 
 	void update_ap_mld_info(em_ap_mld_info_t *ap_mld_info);
-	static void update_ap_mld_info(void *dm, em_ap_mld_info_t *ap_mld_info) { (static_cast<dm_easy_mesh_t *>(dm))->update_ap_mld_info(ap_mld_info); }
+	static void update_ap_mld_info(void *dm, em_ap_mld_info_t *ap_mld_info) { if (!dm || !ap_mld_info) throw std::invalid_argument("null argument"); (static_cast<dm_easy_mesh_t *>(dm))->update_ap_mld_info(ap_mld_info); }
 
 	void update_bsta_mld_info(em_bsta_mld_info_t *bsta_mld_info);
 	static void update_bsta_mld_info(void *dm, em_bsta_mld_info_t *bsta_mld_info) { (static_cast<dm_easy_mesh_t *>(dm))->update_bsta_mld_info(bsta_mld_info); }
@@ -1755,12 +1671,8 @@ public:
 	void update_assoc_sta_mld_info(em_assoc_sta_mld_info_t *assoc_sta_mld_info);
 	static void update_assoc_sta_mld_info(void *dm, em_assoc_sta_mld_info_t *assoc_sta_mld_info) { (static_cast<dm_easy_mesh_t *>(dm))->update_assoc_sta_mld_info(assoc_sta_mld_info); }
 
-	void remove_assoc_sta_mld_info(mac_address_t sta_mld_mac);
-	bool is_ap_mld_mac(const mac_address_t mac);
-	bool resolve_ap_mld_to_fallback_ruid(const mac_address_t ap_mld_mac, mac_address_t fallback_ruid);
-
-	em_radio_cap_info_t *get_radio_cap_info(unsigned int index);
-	static em_radio_cap_info_t *get_radio_cap_info(void *dm, unsigned int index) { return (static_cast<dm_easy_mesh_t *>(dm))->get_radio_cap_info(index); }
+	em_radio_cap_info_t *get_radio_cap_info(int index);
+	static em_radio_cap_info_t *get_radio_cap_info(void *dm, int index) { return (static_cast<dm_easy_mesh_t *>(dm))->get_radio_cap_info(index); }
 
 	/**!
 	 * @brief Retrieves the Data Model DPP object.
@@ -1821,7 +1733,7 @@ public:
 	 *
 	 * @note Ensure that the index is within the valid range of available radio interfaces.
 	 */
-	em_interface_t *get_radio_interface(unsigned int index) { return m_radio[index].get_radio_interface(); }
+	em_interface_t *get_radio_interface(unsigned int index) { if (index >= m_num_radios) return nullptr; return m_radio[index].get_radio_interface(); }
     
 	/**!
 	 * @brief Retrieves the radio information for a given index.
@@ -1836,7 +1748,7 @@ public:
 	 *
 	 * @note Ensure that the index is within the valid range of available radios.
 	 */
-	em_radio_info_t *get_radio_info(unsigned int index) { return m_radio[index].get_radio_info(); }
+	em_radio_info_t *get_radio_info(unsigned int index) { if (index >= m_num_radios) return nullptr; return m_radio[index].get_radio_info(); }
     
 	/**!
 	 * @brief Retrieves radio information for a given index.
@@ -1851,7 +1763,7 @@ public:
 	 *
 	 * @note Ensure that the index is within the valid range of available radios.
 	 */
-	static em_radio_info_t *get_radio_info(void *dm, unsigned int index) { return (static_cast<dm_easy_mesh_t *>(dm))->get_radio_info(index); }
+	static em_radio_info_t *get_radio_info(void *dm, unsigned int index) { if (!dm) return nullptr; return (static_cast<dm_easy_mesh_t *>(dm))->get_radio_info(index); }
     
 	/**!
 	 * @brief Retrieves the radio data for a given interface.
@@ -1887,7 +1799,7 @@ public:
 	 *
 	 * @returns The number of radios as an unsigned integer.
 	 */
-	static unsigned int get_num_radios(void *dm) { return (static_cast<dm_easy_mesh_t *>(dm))->get_num_radios(); }
+	static unsigned int get_num_radios(void *dm) { if (!dm) return 0; return (static_cast<dm_easy_mesh_t *>(dm))->get_num_radios(); }
     
 	/**!
 	 * @brief Sets the number of radios.
@@ -1908,7 +1820,7 @@ public:
 	 *
 	 * @note Ensure that the mesh network configuration object is properly initialized before calling this function.
 	 */
-	static void set_num_radios(void *dm, unsigned int num) { (static_cast<dm_easy_mesh_t *>(dm))->set_num_radios(num); }
+	static void set_num_radios(void *dm, unsigned int num) { if (!dm) throw std::invalid_argument("null dm"); (static_cast<dm_easy_mesh_t *>(dm))->set_num_radios(num); }
     
 	/**!
 	 * @brief Finds a matching radio from a given radio object.
@@ -1937,7 +1849,7 @@ public:
 	 * @note Ensure that the MAC address provided is valid and registered in the system.
 	 */
 	dm_radio_cap_t *get_radio_cap(mac_address_t mac);
-	dm_radio_cap_t *get_radio_cap(unsigned int index);
+	dm_radio_cap_t *get_radio_cap(int index);
 
     
 	/**!
@@ -2012,7 +1924,7 @@ public:
 	 *
 	 * @note Ensure that the manufacturer name is a valid string and the pointer is not null.
 	 */
-	void set_manufacturer(char *manufacturer) { m_device.set_manufacturer(manufacturer); }
+	void set_manufacturer(char *manufacturer) { if (!manufacturer) throw std::invalid_argument("null manufacturer"); m_device.set_manufacturer(manufacturer); }
     
 	/**!
 	 * @brief Sets the manufacturer model for the device.
@@ -2023,7 +1935,7 @@ public:
 	 *
 	 * @note Ensure that the model string is null-terminated and valid.
 	 */
-	void set_manufacturer_model(char *model) { m_device.set_manufacturer_model(model); }
+	void set_manufacturer_model(char *model) { if (!model) throw std::invalid_argument("null model"); m_device.set_manufacturer_model(model); }
     
 	/**!
 	 * @brief Sets the software version for the device.
@@ -2034,7 +1946,7 @@ public:
 	 *
 	 * @note Ensure that the version string is null-terminated.
 	 */
-	void set_software_version(char *version) { m_device.set_software_version(version); }
+	void set_software_version(char *version) { if (!version) throw std::invalid_argument("null version"); m_device.set_software_version(version); }
     
 	/**!
 	 * @brief Sets the serial number for the device.
@@ -2047,7 +1959,7 @@ public:
 	 * @note Ensure that the serial number is null-terminated and does not exceed
 	 * the maximum allowed length for the device.
 	 */
-	void set_serial_number(char *serial) { m_device.set_serial_number(serial); }
+	void set_serial_number(char *serial) { if (!serial) throw std::invalid_argument("null serial"); m_device.set_serial_number(serial); }
     
 	/**!
 	 * @brief Sets the primary device type.
@@ -2058,7 +1970,7 @@ public:
 	 *
 	 * @note Ensure that the `type` parameter is a valid string representing the device type.
 	 */
-	void set_primary_device_type(char *type) { m_device.set_primary_device_type(type); }
+	void set_primary_device_type(char *type) { if (!type) throw std::invalid_argument("null type"); m_device.set_primary_device_type(type); }
     //void operator =(dm_easy_mesh_t const& obj);
     dm_easy_mesh_t& operator =(dm_easy_mesh_t const& obj);
     bool operator ==(dm_easy_mesh_t const& obj);
@@ -2081,7 +1993,7 @@ public:
 	 *
 	 * @note Ensure that the provided context is properly initialized before calling this function.
 	 */
-	void    set_cmd_ctx(em_cmd_ctx_t *ctx) { memcpy(&m_cmd_ctx, ctx, sizeof(em_cmd_ctx_t)); }
+	void    set_cmd_ctx(em_cmd_ctx_t *ctx) { if (!ctx) throw std::invalid_argument("null ctx"); memcpy(&m_cmd_ctx, ctx, sizeof(em_cmd_ctx_t)); }
     
 	/**!
 	 * @brief Resets the command context to its initial state.
@@ -2157,7 +2069,7 @@ public:
 	 * @note Ensure that the `info` pointer is valid and points to a properly initialized `em_sta_info_t` structure.
 	 */
 	void put_sta_info(em_sta_info_t *info, em_target_sta_map_t target);
-
+    
 	/**!
 	 * @brief Retrieves the first station information.
 	 *
@@ -2171,7 +2083,7 @@ public:
 	 *
 	 * @note Ensure that the dm pointer is valid before calling this function.
 	 */
-	static em_sta_info_t *get_first_sta_info(void *dm, em_target_sta_map_t target) { return (static_cast<dm_easy_mesh_t *>(dm))->get_first_sta_info(target); }
+	static em_sta_info_t *get_first_sta_info(void *dm, em_target_sta_map_t target) { if (!dm) return nullptr; return (static_cast<dm_easy_mesh_t *>(dm))->get_first_sta_info(target); }
     
 	/**!
 	 * @brief Retrieves the next station information from the mesh network.
@@ -2219,28 +2131,7 @@ public:
 	 */
 	static void put_sta_info(void *dm, em_sta_info_t *info, em_target_sta_map_t target) { (static_cast<dm_easy_mesh_t *>(dm))->put_sta_info(info, target); }
 
-	/**!
-	 * @brief Checks whether a station (STA) is currently associated with a given BSSID.
-	 *
-	 * This function determines if the station identified by @p sta_mac is
-	 * presently associated with the basic service set identified by @p bssid
-	 * in the EasyMesh data model.
-	 *
-	 * @param[in] bssid    The BSSID of the access point/BSS to check against.
-	 *                     The association check is performed specifically for
-	 *                     this BSSID and does not search across other BSSIDs.
-	 * @param[in] sta_mac  The MAC address of the station whose association
-	 *                     state is being queried.
-	 *
-	 * @returns true if the station is recorded as associated with the given
-	 *          BSSID, false otherwise.
-	 *
-	 * @note Callers are expected to provide valid, normalized MAC addresses
-	 *       for both @p bssid and @p sta_mac that correspond to entities
-	 *       known to the EasyMesh instance.
-	 */
-	bool is_sta_associated(bssid_t bssid, mac_address_t sta_mac);
-
+    
 	/**!
 	 * @brief Finds a station (STA) based on its MAC address and BSSID.
 	 *
@@ -2258,8 +2149,6 @@ public:
 	 *       the network's configuration.
 	 */
 	dm_sta_t *find_sta(mac_address_t sta_mac, bssid_t bssid);
-
-	dm_sta_t *find_sta(mac_address_t sta_mac);
     
 	/**!
 	 * @brief Retrieves the first station associated with the given MAC address.

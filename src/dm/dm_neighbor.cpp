@@ -41,6 +41,7 @@
 
 int dm_neighbor_t::decode(const cJSON *obj, void *parent_id)
 {
+    if (obj == NULL || parent_id == NULL) { return -1; }
     cJSON *tmp;
     mac_addr_str_t  mac_str;
 

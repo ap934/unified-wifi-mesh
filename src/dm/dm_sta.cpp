@@ -37,6 +37,7 @@
 
 int dm_sta_t::decode(const cJSON *obj, void *parent_id)
 {
+    if (obj == NULL || parent_id == NULL) { return -1; }
     cJSON *tmp;
     mac_addr_str_t  mac_str;
 
@@ -148,6 +149,7 @@ int dm_sta_t::decode(const cJSON *obj, void *parent_id)
 
 void dm_sta_t::encode(cJSON *obj, em_get_sta_list_reason_t reason)
 {
+    if (obj == NULL) { return; }
     mac_addr_str_t  mac_str;
     cJSON *reason_obj, *request_obj;
 

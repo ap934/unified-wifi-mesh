@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
 
 ::testing::GTEST_FLAG(filter) =
-    "-dm_ap_mld_t_Test.DecodeValidJsonObjectWithNullParentID:"
+    "dm_ap_mld_t_Test.DecodeValidJsonObjectWithNullParentID:"
     "dm_ap_mld_t_Test.DecodeNullJsonObjectWithValidParentID:"
     "dm_ap_mld_t_Test.DecodeInvalidJsonObjectWithValidParentID:"
     "dm_ap_mld_t_Test.EncodeWithNullCJSONObject:"
@@ -235,7 +235,7 @@ int main(int argc, char **argv) {
     "em_onewifi_t.ConvertMacAddressWithInvalidLength:"
     "em_onewifi_t.InvalidMACAddressStringIncorrectLength:"
     "em_onewifi_t.EmptyMACAddressString:"
-    "em_onewifi_t.ValidNetworkInterfaceName:"	
+    "em_onewifi_t.ValidNetworkInterfaceName:"
     "db_client_crud_Test.ExecuteValidSelectQuery:"
     "db_client_crud_Test.GetNumberValidColumn:"
     "db_client_crud_Test.GetNumberNonNumericColumn:"
@@ -246,8 +246,8 @@ int main(int argc, char **argv) {
     "db_client_crud_Test.NextResultNoMoreRows:"
     "db_client_crud_Test.NextResultInvalidContext:"
     "db_client_t_Test.RecreateDatabaseWithValidConnection:"
-    "db_client_tTest.ConnectWithValidDatabasePath:"
     "db_client_t_Test.ExecuteNullQuery:"
+    "db_client_tTest.ConnectWithValidDatabasePath:"
     "dm_tid_to_link_t_Test.ValidJSONObjectWithIncorrectType:"
     "dm_tid_to_link_t_Test.InvalidNumberOfMappings:"
     "dm_tid_to_link_t_Test.NullTIDToLinkInformation:"
@@ -450,7 +450,7 @@ int main(int argc, char **argv) {
     "em_msg_t.get_profile_null_pointer:"
     "em_msg_t.get_profile_type_null:"
     "em_msg_t.get_radio_id_null_mac_pointer:"
-    "em_msg_t.get_radio_id_empty_tlvs_buffer:"        
+    "em_msg_t.get_radio_id_empty_tlvs_buffer:"
     "dm_easy_mesh_list_tTEST.create_data_model_negative_null_net_id:"
     "dm_easy_mesh_list_tTEST.create_data_model_negative_null_al_intf:"
     "dm_easy_mesh_list_tTEST.delete_data_model_non_existent:"

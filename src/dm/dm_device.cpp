@@ -37,6 +37,7 @@
 
 int dm_device_t::decode(const cJSON *obj, void *parent_id)
 {
+    if (obj == NULL || parent_id == NULL) { return -1; }
     cJSON *tmp, *tmp_arr;
     mac_addr_str_t  mac_str;
     int i;
@@ -338,6 +339,7 @@ bool dm_device_t::operator == (const dm_device_t& obj)
 
 int dm_device_t::parse_device_id_from_key(const char *key, em_device_id_t *id)
 {
+    if (key == NULL || id == NULL) { return -1; }
 	em_long_string_t   str;
     char *tmp, *remain;
     unsigned int i = 0;

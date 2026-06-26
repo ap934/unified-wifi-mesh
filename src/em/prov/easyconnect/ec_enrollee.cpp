@@ -1981,6 +1981,10 @@ bool ec_enrollee_t::process_direct_encap_dpp_msg(uint8_t* dpp_frame, uint16_t dp
         em_printfout("DPP Message Frame is empty");
         return false;
     }
+    if (src_mac == NULL) {
+        em_printfout("src_mac is NULL");
+        return false;
+    }
 
     ec_frame_t* ec_frame = reinterpret_cast<ec_frame_t*>(dpp_frame);
 

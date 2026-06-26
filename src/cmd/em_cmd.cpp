@@ -93,6 +93,7 @@ void em_cmd_t::set_event_data_length(unsigned int len)
 
 void em_cmd_t::copy_bus_event(em_bus_event_t *evt)
 {
+    if (evt == NULL) { return; }
 	em_bus_event_t *bevt;
 
 	m_evt->type = em_event_type_bus;
@@ -113,6 +114,7 @@ void em_cmd_t::copy_frame_event(em_frame_event_t *evt)
 
 char *em_cmd_t::status_to_string(em_cmd_out_status_t status, char *str)
 {
+    if (str == NULL) { return NULL; }
     cJSON *obj, *res = NULL;
     em_long_string_t status_str;
     em_subdoc_info_t *info;
@@ -882,6 +884,7 @@ em_bus_event_type_t em_cmd_t::cmd_2_bus_event_type(em_cmd_type_t ctype)
 
 int em_cmd_t::dump_bus_event(em_bus_event_t *evt)
 {
+    if (evt == NULL) { return -1; }
     unsigned int i;
     em_subdoc_info_t *info;
 

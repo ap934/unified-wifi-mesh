@@ -38,6 +38,7 @@
 
 int dm_radio_t::decode(const cJSON *obj, void *parent_id)
 {
+    if (obj == NULL || parent_id == NULL) { return -1; }
     cJSON *tmp;
     mac_addr_str_t  mac_str, dev_mac;
 
@@ -248,6 +249,7 @@ void dm_radio_t::operator = (const dm_radio_t& obj)
 
 int dm_radio_t::parse_radio_id_from_key(const char *key, em_radio_id_t *id)
 {
+    if (key == NULL || id == NULL) { return -1; }
 	em_long_string_t   str;
     char *tmp, *remain;
     unsigned int i = 0;

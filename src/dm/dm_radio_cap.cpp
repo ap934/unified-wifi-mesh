@@ -37,6 +37,7 @@
 
 int dm_radio_cap_t::decode(const cJSON *obj, void *parent_id)
 {
+    if (obj == NULL || parent_id == NULL) { return -1; }
     //cJSON *tmp;
     //unsigned int i;
     em_interface_t	*id = static_cast<em_interface_t *>(parent_id);
@@ -73,6 +74,7 @@ int dm_radio_cap_t::decode(const cJSON *obj, void *parent_id)
 
 void dm_radio_cap_t::encode(cJSON *obj)
 {
+    if (obj == NULL) { return; }
 /*
     cJSON_AddNumberToObject(obj, "NumberOfOpClass", m_radio_cap_info.num_op_classes);
     cJSON_AddStringToObject(obj, "HTCapabilities", m_radio_cap_info.ht_cap);

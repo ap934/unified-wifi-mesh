@@ -51,6 +51,7 @@ bool em_msg_t::get_tlv(em_tlv_t *itlv)
 
 bool em_msg_t::get_client_mac_info(mac_address_t *mac)
 {
+    if (mac == NULL) { return false; }
     em_tlv_t    *tlv;
     unsigned int len;
     em_client_info_t *cltinfo;
@@ -88,6 +89,7 @@ bool em_msg_t::get_al_mac_address(unsigned char *mac)
 
 bool em_msg_t::get_profile(em_profile_type_t *profile)
 {
+    if (profile == NULL) { return false; }
     em_tlv_t    *tlv;
     unsigned int len;
 
@@ -107,6 +109,7 @@ bool em_msg_t::get_profile(em_profile_type_t *profile)
 
 bool em_msg_t::get_bss_id(mac_address_t *mac)
 {
+    if (mac == NULL) { return false; }
     em_tlv_t    *tlv;
     unsigned int len;
 
@@ -138,6 +141,7 @@ bool em_msg_t::get_bss_id(mac_address_t *mac)
 
 bool em_msg_t::get_radio_id(mac_address_t *mac)
 {
+    if (mac == NULL) { return false; }
     em_tlv_t    *tlv;
     unsigned int len;
 	unsigned int num_radios = 0;
@@ -239,6 +243,7 @@ bool em_msg_t::get_freq_band(em_freq_band_t *band)
 
 bool em_msg_t::get_profile_type(em_profile_type_t *profile)
 {
+    if (profile == NULL) { return false; }
     em_tlv_t    *tlv;
     unsigned int len;
 

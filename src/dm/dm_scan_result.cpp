@@ -37,6 +37,7 @@
 
 int dm_scan_result_t::decode(const cJSON *obj, void *parent_id)
 {
+    if (obj == NULL || parent_id == NULL) { return -1; }
 	cJSON *tmp, *arr_item;
 	char *str;
 	int i;
@@ -117,6 +118,7 @@ int dm_scan_result_t::decode(const cJSON *obj, void *parent_id)
 
 void dm_scan_result_t::encode(cJSON *obj)
 {
+    if (obj == NULL) { return; }
 	cJSON *arr_obj, *tmp;
 	unsigned int i;
 	mac_addr_str_t	bssid_str;

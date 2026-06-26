@@ -70,6 +70,7 @@ dm_network_t *dm_easy_mesh_list_t::get_first_network()
 
 dm_network_t *dm_easy_mesh_list_t::get_next_network(dm_network_t *net)
 {
+    if (net == NULL) { return NULL; }
     dm_network_t *pnet = NULL;
     unsigned int i;
     char *net_id_to_find;
@@ -104,6 +105,7 @@ dm_network_t *dm_easy_mesh_list_t::get_next_network(dm_network_t *net)
 
 dm_network_t *dm_easy_mesh_list_t::get_network(const char *key)
 {
+    if (key == NULL) { return NULL; }
     dm_network_t *net = NULL;
     dm_easy_mesh_t *dm = NULL;
     bool found = false;
@@ -123,11 +125,13 @@ dm_network_t *dm_easy_mesh_list_t::get_network(const char *key)
 
 void dm_easy_mesh_list_t::remove_network(const char *key)
 {
+    if (key == NULL) { return; }
 
 }
 
 void dm_easy_mesh_list_t::put_network(const char *key, const dm_network_t *net)
 {
+    if (key == NULL || net == NULL) { return; }
     dm_easy_mesh_t *dm = NULL;
     dm_network_t *pnet;
     mac_addr_str_t	mac_str;
@@ -188,7 +192,8 @@ dm_device_t *dm_easy_mesh_list_t::get_next_device(dm_device_t *dev)
 }
 
 dm_device_t *dm_easy_mesh_list_t::get_device(const char *key)
-{   
+{
+    if (key == NULL) { return NULL; }   
     dm_easy_mesh_t *dm;
 	em_device_id_t	id;
 
@@ -205,6 +210,7 @@ dm_device_t *dm_easy_mesh_list_t::get_device(const char *key)
 
 void dm_easy_mesh_list_t::remove_device(const char *key)
 {
+    if (key == NULL) { return; }
     dm_easy_mesh_t *dm;
     dm = static_cast<dm_easy_mesh_t *> (hash_map_remove(m_list, key));
 	if (dm != NULL) {
@@ -214,6 +220,7 @@ void dm_easy_mesh_list_t::remove_device(const char *key)
 
 void dm_easy_mesh_list_t::put_device(const char *key, const dm_device_t *dev)
 {
+    if (key == NULL || dev == NULL) { return; }
     dm_easy_mesh_t *dm;
     dm_device_t *pdev;
     mac_addr_str_t mac_str;
@@ -239,6 +246,7 @@ void dm_easy_mesh_list_t::put_device(const char *key, const dm_device_t *dev)
 
 void dm_easy_mesh_list_t::update_device(const char *key, const dm_device_t *dev)
 {
+    if (key == NULL || dev == NULL) { return; }
     dm_easy_mesh_t *dm;
     dm_device_t *pdev;
     mac_addr_str_t mac_str;
@@ -317,7 +325,8 @@ dm_radio_t *dm_easy_mesh_list_t::get_next_radio(dm_radio_t *radio)
 }
 
 dm_radio_t *dm_easy_mesh_list_t::get_radio(const char *key)
-{  
+{
+    if (key == NULL) { return NULL; }  
     dm_radio_t *radio = NULL;
     dm_easy_mesh_t *dm;
 	unsigned int i;
@@ -347,11 +356,13 @@ dm_radio_t *dm_easy_mesh_list_t::get_radio(const char *key)
 
 void dm_easy_mesh_list_t::remove_radio(const char *key)
 {
+    if (key == NULL) { return; }
 
 }
 
 void dm_easy_mesh_list_t::put_radio(const char *key, const dm_radio_t *radio)
 {
+    if (key == NULL || radio == NULL) { return; }
     dm_radio_t *pradio = NULL;
     dm_easy_mesh_t	*dm = NULL;
     em_t *em = NULL;
@@ -512,6 +523,7 @@ dm_bss_t *dm_easy_mesh_list_t::get_next_bss(dm_bss_t *bss)
 
 dm_bss_t *dm_easy_mesh_list_t::get_bss(const char *key)
 {
+    if (key == NULL) { return NULL; }
 	em_bss_id_t id;
 	mac_addr_str_t dev_mac_str;
 	dm_easy_mesh_t *dm;
@@ -566,6 +578,7 @@ dm_bss_t *dm_easy_mesh_list_t::get_next_bss(mac_addr_t al_mac, dm_bss_t *bss)
 
 void dm_easy_mesh_list_t::remove_bss(const char *key)
 {
+    if (key == NULL) { return; }
 	em_bss_id_t id;
 	dm_easy_mesh_t *dm;
 	unsigned int i;
@@ -589,6 +602,7 @@ void dm_easy_mesh_list_t::remove_bss(const char *key)
 
 void dm_easy_mesh_list_t::put_bss(const char *key, const dm_bss_t *bss)
 {
+    if (key == NULL || bss == NULL) { return; }
 	em_bss_id_t id;
 	mac_addr_str_t	dev_mac_str, radio_mac_str, bssid_str;
 	dm_easy_mesh_t *dm;
@@ -654,7 +668,8 @@ dm_sta_t *dm_easy_mesh_list_t::get_next_sta(dm_sta_t *psta)
 }   
     
 dm_sta_t *dm_easy_mesh_list_t::get_sta(const char *key)
-{   
+{
+    if (key == NULL) { return NULL; }   
     dm_sta_t *sta;
     dm_easy_mesh_t *dm;
     mac_address_t sta_mac, ruid;
@@ -699,11 +714,13 @@ dm_sta_t *dm_easy_mesh_list_t::get_sta(const char *key)
 
 void dm_easy_mesh_list_t::remove_sta(const char *key)
 {
+    if (key == NULL) { return; }
 
 }
 
 void dm_easy_mesh_list_t::put_sta(const char *key, const dm_sta_t *sta)
 {
+    if (key == NULL || sta == NULL) { return; }
     dm_sta_t *psta;
     dm_easy_mesh_t *dm;
     mac_address_t sta_mac, ruid;
@@ -810,6 +827,7 @@ dm_network_ssid_t *dm_easy_mesh_list_t::get_next_network_ssid(dm_network_ssid_t 
 
 dm_network_ssid_t *dm_easy_mesh_list_t::get_network_ssid(const char *key)
 {
+    if (key == NULL) { return NULL; }
     dm_network_ssid_t *net_ssid = NULL;
     dm_easy_mesh_t *dm;
     unsigned int i;
@@ -849,6 +867,7 @@ void dm_easy_mesh_list_t::debug_probe()
 
 void dm_easy_mesh_list_t::remove_network_ssid(const char *key)
 {
+    if (key == NULL) { return; }
     dm_network_ssid_t *net_ssid = NULL, *tgt;
     dm_easy_mesh_t *dm;
     unsigned int i;
@@ -984,6 +1003,7 @@ dm_op_class_t *dm_easy_mesh_list_t::get_next_op_class(dm_op_class_t *op_class)
 
 dm_op_class_t *dm_easy_mesh_list_t::get_op_class(const char *key)
 {
+    if (key == NULL) { return NULL; }
 	em_op_class_id_t id;
     dm_easy_mesh_t *dm;
 	dm_radio_t *radio;
@@ -1102,11 +1122,13 @@ dm_op_class_t *dm_easy_mesh_list_t::get_next_pre_set_op_class_by_type(em_op_clas
 
 void dm_easy_mesh_list_t::remove_op_class(const char *key)
 {
+    if (key == NULL) { return; }
 
 }
 
 void dm_easy_mesh_list_t::put_op_class(const char *key, const dm_op_class_t *op_class)
 {
+    if (key == NULL || op_class == NULL) { return; }
 	em_op_class_id_t id;
 	mac_addr_str_t mac_str;
 	dm_easy_mesh_t *dm;
@@ -1228,6 +1250,7 @@ dm_policy_t *dm_easy_mesh_list_t::get_next_policy(dm_policy_t *policy)
 
 dm_policy_t *dm_easy_mesh_list_t::get_policy(const char *key)
 {
+    if (key == NULL) { return NULL; }
 	em_policy_id_t	id;
 	dm_easy_mesh_t	*dm;
 	mac_addr_str_t	dev_mac_str, radio_mac_str;
@@ -1265,11 +1288,13 @@ dm_policy_t *dm_easy_mesh_list_t::get_policy(const char *key)
 
 void dm_easy_mesh_list_t::remove_policy(const char *key)
 {
+    if (key == NULL) { return; }
 
 }
 
 void dm_easy_mesh_list_t::put_policy(const char *key, const dm_policy_t *policy)
 {
+    if (key == NULL || policy == NULL) { return; }
 	em_policy_id_t	id;
 	dm_easy_mesh_t	*dm;
 	mac_addr_str_t	dev_mac_str;
@@ -1329,6 +1354,7 @@ dm_scan_result_t *dm_easy_mesh_list_t::get_next_scan_result(dm_scan_result_t *sc
 
 dm_scan_result_t *dm_easy_mesh_list_t::get_scan_result(const char *key)
 {
+    if (key == NULL) { return NULL; }
 	em_scan_result_id_t	id;
 	dm_easy_mesh_t	*dm;
 	mac_addr_str_t	dev_mac_str, scanner_mac_str;
@@ -1354,6 +1380,7 @@ dm_scan_result_t *dm_easy_mesh_list_t::get_scan_result(const char *key)
 
 void dm_easy_mesh_list_t::remove_scan_result(const char *key)
 {
+    if (key == NULL) { return; }
     em_scan_result_id_t id;
     mac_addr_str_t	dev_mac_str, scanner_mac_str, bssid_str;
     bssid_t bssid;

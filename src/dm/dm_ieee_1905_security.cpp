@@ -34,6 +34,7 @@
 
 int dm_ieee_1905_security_t::decode(const cJSON *obj)
 {
+    if (obj == NULL) { return -1; }
     cJSON *tmp;
 
     if ((tmp = cJSON_GetObjectItem(obj, "OnboardingProtocol")) != NULL) {

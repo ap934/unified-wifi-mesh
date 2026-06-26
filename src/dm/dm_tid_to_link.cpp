@@ -36,6 +36,7 @@
 
 int dm_tid_to_link_t::decode(const cJSON *obj, void *parent_id)
 {
+    if (obj == NULL || parent_id == NULL) { return -1; }
     //TODO: needs to be implemnented
 
     return 0;
@@ -43,6 +44,7 @@ int dm_tid_to_link_t::decode(const cJSON *obj, void *parent_id)
 
 void dm_tid_to_link_t::encode(cJSON *obj)
 {
+    if (obj == NULL) { return; }
     //TODO: needs to be implemnented
 }
 
