@@ -906,7 +906,11 @@ int dm_easy_mesh_agent_t::analyze_unassoc_sta_result(em_bus_event_t *evt, em_cmd
 
     em_unassoc_sta_metrics_rsp_t *rsp;
 
-    translate_and_decode_onewifi_subdoc((char *)evt->u.raw_buff, webconfig_subdoc_type_em_unassoc_sta_link_metrics, "Unassoc STA Metrics Response");
+    // TODO(RDKBWIFI-684): webconfig_subdoc_type_em_unassoc_sta_link_metrics is not yet
+    // available in the pinned OneWifi (ccsp-one-wifi SRCREV 6562f8a4). Re-enable this
+    // translate call once the paired OneWifi PR for #684 (Unassociated STA Link Metrics)
+    // lands and ccsp-one-wifi/libwebconfig are bumped to a revision that defines it.
+    // translate_and_decode_onewifi_subdoc((char *)evt->u.raw_buff, webconfig_subdoc_type_em_unassoc_sta_link_metrics, "Unassoc STA Metrics Response");
 
     json = cJSON_Parse((const char *)evt->u.raw_buff);
 
