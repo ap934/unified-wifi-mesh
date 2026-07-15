@@ -37,6 +37,10 @@
 
 int dm_device_t::decode(const cJSON *obj, void *parent_id)
 {
+    if (obj == nullptr || parent_id == nullptr || obj->child == nullptr) {
+        return -1;
+    }
+
     cJSON *tmp, *tmp_arr;
     mac_addr_str_t  mac_str;
     int i;
@@ -338,6 +342,12 @@ bool dm_device_t::operator == (const dm_device_t& obj)
 
 int dm_device_t::parse_device_id_from_key(const char *key, em_device_id_t *id)
 {
+    if (key == nullptr || id == nullptr) {
+        return -1;
+    }
+    if (strlen(key) == 0) {
+        return -1;
+    }
 	em_long_string_t   str;
     char *tmp, *remain;
     unsigned int i = 0;
@@ -357,6 +367,10 @@ int dm_device_t::parse_device_id_from_key(const char *key, em_device_id_t *id)
             id->media = static_cast<em_media_type_t> (atoi(tmp));
         }  
         i++;
+    }
+
+    if (i > 0 && i < 2) {
+        return -1;
     }
 
 	return 0;

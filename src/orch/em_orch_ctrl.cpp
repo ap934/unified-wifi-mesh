@@ -19,6 +19,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <stdexcept>
 #include <signal.h>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -43,6 +44,12 @@
 
 void em_orch_ctrl_t::orch_transient(em_cmd_t *pcmd, em_t *em)
 {
+    if (pcmd == nullptr) {
+        throw std::invalid_argument("null pcmd");
+    }
+    if (em == nullptr) {
+        throw std::invalid_argument("null em");
+    }
     em_cmd_stats_t *stats;
     em_short_string_t key;
 
@@ -301,6 +308,12 @@ bool em_orch_ctrl_t::is_em_ready_for_orch_fini(em_cmd_t *pcmd, em_t *em)
 
 bool em_orch_ctrl_t::is_em_ready_for_orch_exec(em_cmd_t *pcmd, em_t *em)
 {
+    if (pcmd == nullptr) {
+        return false;
+    }
+    if (em == nullptr) {
+        return false;
+    }
     switch (pcmd->m_type) {
         case em_cmd_type_set_ssid:
         case em_cmd_type_set_radio:
@@ -363,6 +376,15 @@ bool em_orch_ctrl_t::is_em_ready_for_orch_exec(em_cmd_t *pcmd, em_t *em)
 
 void em_orch_ctrl_t::pre_process_cancel(em_cmd_t *pcmd, em_t *em)
 {
+    if (pcmd == nullptr) {
+        throw std::invalid_argument("null pcmd");
+    }
+    if (em == nullptr) {
+        throw std::invalid_argument("null em");
+    }
+    if (pcmd->get_type() >= em_cmd_type_max) {
+        throw std::invalid_argument("invalid command type");
+    }
 	em_event_t  ev;
     em_bus_event_t *bev;
     em_bus_event_type_cfg_renew_params_t    *raw;
@@ -411,6 +433,9 @@ void em_orch_ctrl_t::pre_process_cancel(em_cmd_t *pcmd, em_t *em)
 
 bool em_orch_ctrl_t::pre_process_orch_op(em_cmd_t *pcmd)
 {
+    if (pcmd == nullptr) {
+        return false;
+    }
     em_t *em;
     em_ctrl_t *ctrl = static_cast<em_ctrl_t *>(m_mgr);
     dm_easy_mesh_ctrl_t *dm_ctrl = reinterpret_cast<dm_easy_mesh_ctrl_t *>(ctrl->get_data_model(GLOBAL_NET_ID));
@@ -555,6 +580,9 @@ bool em_orch_ctrl_t::pre_process_orch_op(em_cmd_t *pcmd)
 
 unsigned int em_orch_ctrl_t::build_candidates(em_cmd_t *pcmd)
 {
+    if (pcmd == nullptr) {
+        return 0;
+    }
     em_t *em;
     std::vector<em_t *> sta_assoc_fallback_ems;
     dm_easy_mesh_t *dm;
@@ -784,5 +812,8 @@ unsigned int em_orch_ctrl_t::build_candidates(em_cmd_t *pcmd)
 
 em_orch_ctrl_t::em_orch_ctrl_t(em_mgr_t *mgr)
 {
+    if (mgr == nullptr) {
+        throw std::invalid_argument("null mgr");
+    }
     m_mgr = mgr;
 }
