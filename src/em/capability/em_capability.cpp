@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdexcept>
 #include <errno.h>
 #include <assert.h>
 #include <signal.h>
@@ -1492,6 +1493,20 @@ int em_capability_t::handle_ap_cap_report(unsigned char *buff, unsigned int len)
                 return -1;
             }
 
+            /* Country Code = first 2 ASCII octets of the CAC Capabilities TLV;
+               persist it into the reporting device so it surfaces as Device.{i}.CountryCode. */
+            if (ntohs(tlv->len) >= 2) {
+                const unsigned char *cc = tlv->value;
+                em_device_info_t *dev_info = dm->get_device_info();
+                if ((dev_info != NULL) &&
+                    (cc[0] >= 'A') && (cc[0] <= 'Z') &&
+                    (cc[1] >= 'A') && (cc[1] <= 'Z')) {
+                    dev_info->country_code[0] = static_cast<char>(cc[0]);
+                    dev_info->country_code[1] = static_cast<char>(cc[1]);
+                    dev_info->country_code[2] = '\0';
+                }
+            }
+
             for (int idx = 0; idx < cac->radios_num; idx++)
             {
                 dm_radio_cap_t *radio_cap = dm->get_radio_cap(cac->radios[idx].ruid);
@@ -1605,6 +1620,10 @@ int em_capability_t::handle_ap_cap_report(unsigned char *buff, unsigned int len)
 
 void em_capability_t::process_msg(unsigned char *data, unsigned int len)
 {
+    if (data == NULL) {
+        throw std::invalid_argument("process_msg: data is NULL");
+    }
+
     em_cmdu_t *cmdu = reinterpret_cast<em_cmdu_t *> (data + sizeof(em_raw_hdr_t));
     em_raw_hdr_t *hdr = reinterpret_cast<em_raw_hdr_t *>(data);
 
